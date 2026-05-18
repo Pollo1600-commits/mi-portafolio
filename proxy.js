@@ -62,6 +62,6 @@ const server = http.createServer((req, res) => {
   res.end('Not found');
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor corriendo en puerto ${PORT}`);
 });
