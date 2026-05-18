@@ -1,0 +1,2554 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Estrategia de Inversión 2026–2029</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --surface2: #18181f;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f0f5;
+  --muted: #6b6b80;
+  --green: #00d97e;
+  --green-dim: rgba(0,217,126,0.12);
+  --green-border: rgba(0,217,126,0.3);
+  --blue: #4d9fff;
+  --blue-dim: rgba(77,159,255,0.1);
+  --amber: #ffb830;
+  --amber-dim: rgba(255,184,48,0.1);
+  --red: #ff5c6a;
+  --red-dim: rgba(255,92,106,0.1);
+  --purple: #a78bfa;
+  --purple-dim: rgba(167,139,250,0.1);
+  --btc: #f7931a;
+  --btc-dim: rgba(247,147,26,0.1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* TAB NAV */
+.tab-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  gap: 0;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.tab-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 14px 20px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+/* TAB PAGES */
+.tab-page { display: none; }
+.tab-page.active { display: block; }
+
+/* PORTFOLIO TAB STYLES */
+.pf-grid4 { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:1.5rem; }
+.pf-grid2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:1.5rem; }
+.pf-grid3 { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:1.5rem; }
+.pf-met { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px; position:relative; overflow:hidden; }
+.pf-met::after { content:''; position:absolute; top:0;left:0;right:0; height:1px; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent); }
+.pf-lbl { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin:0 0 6px; }
+.pf-val { font-family:'Syne',sans-serif; font-size:22px; font-weight:700; margin:0; }
+.pf-sub { font-size:11px; color:var(--muted); margin-top:3px; }
+.pf-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 1.25rem; margin-bottom:1rem; }
+.pf-st { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin:0 0 14px; }
+.pf-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:0.5px solid var(--border); font-size:13px; }
+.pf-row:last-child { border-bottom:none; }
+.pf-ticker { font-weight:600; width:60px; flex-shrink:0; font-family:'DM Mono',monospace; font-size:12px; }
+.pf-bar-wrap { flex:1; background:rgba(255,255,255,0.05); border-radius:4px; height:6px; overflow:hidden; }
+.pf-bar { height:100%; border-radius:4px; }
+.pf-pct { font-family:'DM Mono',monospace; font-size:12px; font-weight:500; width:44px; text-align:right; flex-shrink:0; }
+.pf-usd { font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); width:80px; text-align:right; flex-shrink:0; }
+.pf-pl { font-family:'DM Mono',monospace; font-size:12px; width:90px; text-align:right; flex-shrink:0; }
+.pf-sector { font-size:11px; color:var(--muted); width:100px; flex-shrink:0; }
+/* Position editor */
+.pos-table { width:100%; border-collapse:collapse; font-size:12px; }
+.pos-table th { font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; padding:8px 6px; text-align:left; border-bottom:1px solid var(--border); font-weight:400; }
+.pos-table td { padding:6px; border-bottom:0.5px solid var(--border); vertical-align:middle; }
+.pos-table tr:last-child td { border-bottom:none; }
+.pos-input { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:5px 8px; color:var(--text); font-family:'DM Mono',monospace; font-size:11px; width:100%; outline:none; transition:border-color 0.2s; }
+.pos-input:focus { border-color:var(--blue); }
+.pos-status { display:inline-block; font-size:10px; padding:2px 8px; border-radius:100px; font-weight:500; }
+.pos-open { background:var(--green-dim); color:var(--green); }
+.pos-closed { background:rgba(255,255,255,0.05); color:var(--muted); }
+.alert-item { display:flex; gap:12px; padding:10px 0; border-bottom:0.5px solid var(--border); font-size:13px; align-items:flex-start; }
+.alert-item:last-child { border-bottom:none; }
+.alert-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+.alert-title { font-weight:500; margin-bottom:2px; }
+.alert-sub { font-size:11px; color:var(--muted); }
+.sync-banner { background:var(--blue-dim); border:1px solid rgba(77,159,255,0.2); border-radius:10px; padding:12px 16px; margin-bottom:1.5rem; font-size:12px; color:var(--blue); display:flex; align-items:center; gap:8px; }
+.btn-update { background:var(--blue); color:#000; border:none; border-radius:8px; padding:8px 18px; font-size:12px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; }
+.btn-update:hover { background:#6db3ff; }
+.detail-table { width:100%; border-collapse:collapse; font-size:11px; }
+.detail-table th { font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); letter-spacing:0.06em; text-transform:uppercase; padding:8px 8px; text-align:right; border-bottom:1px solid var(--border); font-weight:400; }
+.detail-table th:first-child { text-align:left; }
+.detail-table td { padding:8px; border-bottom:0.5px solid var(--border); text-align:right; font-family:'DM Mono',monospace; }
+.detail-table td:first-child { text-align:left; font-weight:600; }
+.detail-table tr:last-child td { border-bottom:none; }
+.semaforo { display:inline-block; font-size:10px; padding:2px 8px; border-radius:100px; font-weight:500; }
+.sem-hold { background:var(--green-dim); color:var(--green); }
+.sem-watch { background:var(--amber-dim); color:var(--amber); }
+.sem-over { background:var(--red-dim); color:var(--red); }
+.sem-closed { background:rgba(255,255,255,0.05); color:var(--muted); }
+
+/* GRID BACKGROUND */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* HEADER */
+.header {
+  margin-bottom: 48px;
+}
+.header-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--blue);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.header-tag::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--blue);
+}
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #f0f0f5 0%, #8888aa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header-sub {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 300;
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+/* STATS ROW */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 40px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+}
+.stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+}
+.stat-value.green { color: var(--green); }
+.stat-value.blue { color: var(--blue); }
+.stat-value.amber { color: var(--amber); }
+.stat-value.btc { color: var(--btc); }
+
+/* PROGRESS BAR */
+.global-progress {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 40px;
+}
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.progress-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+}
+.progress-pct {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--blue);
+}
+.progress-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 100px;
+  height: 6px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--blue), var(--green));
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.progress-phases {
+  display: flex;
+  gap: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+}
+.phase-pip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* PHASE BLOCK */
+.phase-block {
+  margin-bottom: 32px;
+}
+.phase-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.phase-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+.phase-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  flex: 1;
+}
+.phase-total {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  border: 1px solid var(--border2);
+  color: var(--muted);
+}
+.phase-goal {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  font-style: italic;
+}
+
+/* QUARTER CARD */
+.quarter-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.quarter-card.active {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px rgba(77,159,255,0.15), 0 4px 24px rgba(77,159,255,0.08);
+}
+.quarter-card.completed {
+  border-color: var(--green-border);
+}
+.quarter-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  cursor: pointer;
+  user-select: none;
+}
+.q-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  min-width: 28px;
+}
+.q-period {
+  font-size: 13px;
+  font-weight: 500;
+  flex: 1;
+}
+.q-amount {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+.q-status {
+  font-size: 11px;
+  padding: 2px 10px;
+  border-radius: 100px;
+  font-weight: 500;
+}
+.q-status.done { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-border); }
+.q-status.active { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(77,159,255,0.3); }
+.q-status.pending { background: rgba(255,255,255,0.04); color: var(--muted); border: 1px solid var(--border); }
+.q-chevron {
+  color: var(--muted);
+  font-size: 12px;
+  transition: transform 0.2s;
+}
+.quarter-card.open .q-chevron { transform: rotate(180deg); }
+
+/* QUARTER BODY */
+.quarter-body {
+  display: none;
+  padding: 0 18px 16px;
+  border-top: 1px solid var(--border);
+}
+.quarter-card.open .quarter-body { display: block; }
+
+/* CHECKLIST ITEMS */
+.checklist {
+  margin-top: 14px;
+}
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.check-item:last-child { border-bottom: none; }
+.check-box {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1.5px solid var(--border2);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  background: transparent;
+}
+.check-item.checked .check-box {
+  background: var(--green);
+  border-color: var(--green);
+}
+.check-item.checked .check-box::after {
+  content: '✓';
+  color: #000;
+  font-size: 11px;
+  font-weight: 700;
+}
+.check-content {
+  flex: 1;
+}
+.check-main {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  transition: color 0.15s;
+}
+.check-item.checked .check-main {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: rgba(107,107,128,0.5);
+}
+.check-sub {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+  font-family: 'DM Mono', monospace;
+}
+.check-amount {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.amt-btc { color: var(--btc); }
+.amt-nvda { color: var(--blue); }
+.amt-amd { color: var(--red); }
+.amt-meta { color: var(--purple); }
+.amt-tsm { color: var(--green); }
+.amt-bio { color: var(--amber); }
+.amt-liq { color: var(--muted); }
+
+/* QUARTER PROGRESS */
+.q-progress {
+  margin-top: 14px;
+  margin-bottom: 4px;
+}
+.q-prog-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.q-prog-track {
+  background: rgba(255,255,255,0.05);
+  border-radius: 100px;
+  height: 4px;
+  overflow: hidden;
+}
+.q-prog-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--blue), var(--green));
+  transition: width 0.5s ease;
+}
+
+/* TIPS */
+.tip-block {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--amber);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 14px;
+}
+.tip-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--amber);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.tip-text {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.tip-text strong { color: var(--text); font-weight: 500; }
+
+/* BTC ACCUMULATOR */
+.btc-tracker {
+  background: var(--surface);
+  border: 1px solid var(--btc-dim);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 32px;
+}
+.btc-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.btc-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--btc-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.btc-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+}
+.btc-sub { font-size: 12px; color: var(--muted); }
+.btc-bars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.btc-bar-item {
+  text-align: center;
+}
+.btc-bar-track {
+  height: 60px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 6px;
+  position: relative;
+}
+.btc-bar-fill {
+  width: 100%;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(180deg, var(--btc) 0%, rgba(247,147,26,0.4) 100%);
+  transition: height 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+.btc-bar-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+}
+.btc-bar-amt {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--btc);
+  font-weight: 500;
+}
+
+/* RULES */
+.rules-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 32px;
+}
+.rules-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rule-item {
+  display: flex;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  align-items: flex-start;
+}
+.rule-item:last-child { border-bottom: none; }
+.rule-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--blue);
+  min-width: 20px;
+  margin-top: 1px;
+}
+.rule-text { color: var(--muted); line-height: 1.5; }
+.rule-text strong { color: var(--text); }
+
+/* EXPORT BTN */
+.export-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 32px;
+}
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.btn-primary {
+  background: var(--blue);
+  color: #000;
+}
+.btn-primary:hover { background: #6db3ff; }
+.btn-secondary {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border2);
+}
+.btn-secondary:hover { background: var(--surface); }
+
+/* NOTES */
+.notes-area {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  resize: vertical;
+  min-height: 60px;
+  margin-top: 10px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.notes-area:focus { border-color: var(--blue); }
+.notes-area::placeholder { color: var(--muted); }
+
+@media (max-width: 600px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .btc-bars { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<!-- TAB NAV -->
+<nav class="tab-nav" style="padding-top:12px;">
+  <button class="tab-btn active" onclick="switchTab('estrategia')">📋 Estrategia</button>
+  <button class="tab-btn" onclick="switchTab('portafolio')">📊 Portafolio</button>
+  <button class="tab-btn" onclick="switchTab('asesor')">🤖 Asesor IA</button>
+</nav>
+
+<!-- TAB: ESTRATEGIA -->
+<div id="tab-estrategia" class="tab-page active">
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-tag">Plan de Inversión Personal</div>
+    <h1>Estrategia 2026–2029</h1>
+    <p class="header-sub">Portafolio de crecimiento agresivo · $1,000 trimestral · 3 años · 3 fases</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Portafolio hoy</div>
+      <div class="stat-value green">$12,406</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Capital a aportar</div>
+      <div class="stat-value blue">$12,000</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">BTC acumulado</div>
+      <div class="stat-value btc" id="btc-total">$525</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Objetivo año 3</div>
+      <div class="stat-value amber">~$35K+</div>
+    </div>
+  </div>
+
+  <!-- GLOBAL PROGRESS -->
+  <div class="global-progress">
+    <div class="progress-header">
+      <span class="progress-title">Progreso global de la estrategia</span>
+      <span class="progress-pct" id="global-pct">8%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="global-bar" style="width:8%"></div>
+    </div>
+    <div class="progress-phases">
+      <div class="phase-pip"><div class="pip-dot" style="background:var(--blue)"></div>Fase 1 (Q1–Q4)</div>
+      <div class="phase-pip"><div class="pip-dot" style="background:var(--green)"></div>Fase 2 (Q5–Q8)</div>
+      <div class="phase-pip"><div class="pip-dot" style="background:var(--purple)"></div>Fase 3 (Q9–Q12)</div>
+    </div>
+  </div>
+
+  <!-- BTC TRACKER -->
+  <div class="btc-tracker">
+    <div class="btc-header">
+      <div class="btc-icon">₿</div>
+      <div>
+        <div class="btc-title">Acumulador BTC</div>
+        <div class="btc-sub">Objetivo: ~$5,200–6,000 al final del año 3</div>
+      </div>
+    </div>
+    <div class="btc-bars">
+      <div class="btc-bar-item">
+        <div class="btc-bar-track">
+          <div class="btc-bar-fill" id="btc-bar-1" style="height:22%"></div>
+        </div>
+        <div class="btc-bar-amt" id="btc-amt-1">$525</div>
+        <div class="btc-bar-label">Hoy</div>
+      </div>
+      <div class="btc-bar-item">
+        <div class="btc-bar-track">
+          <div class="btc-bar-fill" style="height:42%;opacity:0.4"></div>
+        </div>
+        <div class="btc-bar-amt" style="opacity:0.4">$2,400</div>
+        <div class="btc-bar-label">Fin Año 1</div>
+      </div>
+      <div class="btc-bar-item">
+        <div class="btc-bar-track">
+          <div class="btc-bar-fill" style="height:63%;opacity:0.3"></div>
+        </div>
+        <div class="btc-bar-amt" style="opacity:0.3">$3,800</div>
+        <div class="btc-bar-label">Fin Año 2</div>
+      </div>
+      <div class="btc-bar-item">
+        <div class="btc-bar-track">
+          <div class="btc-bar-fill" style="height:100%;opacity:0.2"></div>
+        </div>
+        <div class="btc-bar-amt" style="opacity:0.2">$6,000</div>
+        <div class="btc-bar-label">Fin Año 3</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FASE 1 -->
+  <div class="phase-block">
+    <div class="phase-title-row">
+      <span class="phase-num">FASE 1</span>
+      <span class="phase-name" style="color:var(--blue)">Año 1 — Consolidar + construir BTC</span>
+      <span class="phase-total">$4,000</span>
+    </div>
+    <p class="phase-goal">Objetivo: cerrar META en 4 acc., reforzar NVDA/AMD y acumular $2,400 en BTC</p>
+
+    <!-- Q1 -->
+    <div class="quarter-card completed open" data-q="q1">
+      <div class="quarter-header" onclick="toggleQ(this)">
+        <span class="q-label">Q1</span>
+        <span class="q-period">Enero – Marzo 2026</span>
+        <span class="q-amount">$1,000</span>
+        <span class="q-status done">Completado</span>
+        <span class="q-chevron">▼</span>
+      </div>
+      <div class="quarter-body">
+        <div class="q-progress">
+          <div class="q-prog-row"><span>Progreso Q1</span><span id="q1-pct">0%</span></div>
+          <div class="q-prog-track"><div class="q-prog-fill" id="q1-bar" style="width:0%"></div></div>
+        </div>
+        <div class="checklist" id="q1-list">
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q1" data-amt="500" data-type="btc">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Comprar BTC — primera acumulación</div>
+              <div class="check-sub">DCA inicial · meta Q1</div>
+            </div>
+            <div class="check-amount amt-btc">$500 BTC</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q1" data-amt="300" data-type="meta">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Completar META a 4 acciones completas</div>
+              <div class="check-sub">Rotación de ADBE + aporte complementario</div>
+            </div>
+            <div class="check-amount amt-meta">$300 META</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q1" data-amt="200" data-type="nvda">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Reforzar NVDA — primera compra adicional</div>
+              <div class="check-sub">Entrada a $221 · promedio ponderado queda en $176.58</div>
+            </div>
+            <div class="check-amount amt-nvda">$200 NVDA</div>
+          </div>
+        </div>
+        <div class="tip-block">
+          <div class="tip-title">⚡ Nota Q1</div>
+          <div class="tip-text">Este trimestre ya está <strong>completado</strong>. META rotada de ADBE ✓ · BTC iniciado con $525 ✓ · NVDA reforzada con $300 ✓. Vas <strong>adelantado</strong> en BTC y NVDA vs el plan original.</div>
+        </div>
+        <textarea class="notes-area" placeholder="Notas del Q1..." onchange="saveNote('q1', this.value)" id="notes-q1"></textarea>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quarter-card active open" data-q="q2">
+      <div class="quarter-header" onclick="toggleQ(this)">
+        <span class="q-label">Q2</span>
+        <span class="q-period">Abril – Junio 2026</span>
+        <span class="q-amount">$1,000</span>
+        <span class="q-status active">En curso</span>
+        <span class="q-chevron">▼</span>
+      </div>
+      <div class="quarter-body">
+        <div class="q-progress">
+          <div class="q-prog-row"><span>Progreso Q2</span><span id="q2-pct">0%</span></div>
+          <div class="q-prog-track"><div class="q-prog-fill" id="q2-bar" style="width:0%"></div></div>
+        </div>
+        <div class="checklist" id="q2-list">
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q2" data-amt="575" data-type="btc">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Completar BTC hasta $1,100 total acumulado</div>
+              <div class="check-sub">Faltan $575 · dividir en 2 pagos quincenales de mayo</div>
+            </div>
+            <div class="check-amount amt-btc">$575 BTC</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q2" data-amt="160" data-type="nvda">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Completar NVDA hasta $600 total acumulado</div>
+              <div class="check-sub">Faltan $160 · completar antes del 30 de junio</div>
+            </div>
+            <div class="check-amount amt-nvda">$160 NVDA</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q2" data-amt="265" data-type="liq">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Guardar sobrante como liquidez táctica Q3</div>
+              <div class="check-sub">~$265 reservados para arranque de Q3 en julio</div>
+            </div>
+            <div class="check-amount amt-liq">$265 LIQ</div>
+          </div>
+        </div>
+        <div class="tip-block">
+          <div class="tip-title">⚡ Estrategia Q2</div>
+          <div class="tip-text">Con tus pagos quincenales: <strong>15 mayo → $375 BTC + $125 NVDA</strong>. <strong>1 junio → $200 BTC + $35 NVDA + $265 guardados</strong>. Cierra Q2 antes del 30 de junio limpiamente.</div>
+        </div>
+        <textarea class="notes-area" placeholder="Notas del Q2..." onchange="saveNote('q2', this.value)" id="notes-q2"></textarea>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quarter-card" data-q="q3">
+      <div class="quarter-header" onclick="toggleQ(this)">
+        <span class="q-label">Q3</span>
+        <span class="q-period">Julio – Septiembre 2026</span>
+        <span class="q-amount">$1,000</span>
+        <span class="q-status pending">Pendiente</span>
+        <span class="q-chevron">▼</span>
+      </div>
+      <div class="quarter-body">
+        <div class="q-progress">
+          <div class="q-prog-row"><span>Progreso Q3</span><span id="q3-pct">0%</span></div>
+          <div class="q-prog-track"><div class="q-prog-fill" id="q3-bar" style="width:0%"></div></div>
+        </div>
+        <div class="checklist" id="q3-list">
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q3" data-amt="600" data-type="btc">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Acumular BTC — tercer bloque trimestral</div>
+              <div class="check-sub">Meta acumulada al cierre Q3: ~$1,850 en BTC total</div>
+            </div>
+            <div class="check-amount amt-btc">$600 BTC</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q3" data-amt="400" data-type="amd">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Reforzar AMD si hay corrección de 10%+</div>
+              <div class="check-sub">Si AMD no corrige, mantener en NVDA o guardar liquidez</div>
+            </div>
+            <div class="check-amount amt-amd">$400 AMD</div>
+          </div>
+        </div>
+        <div class="tip-block">
+          <div class="tip-title">⚡ Regla Q3</div>
+          <div class="tip-text">El <strong>$265 de sobrante del Q2</strong> ya te da ventaja al arrancar julio. Si AMD está por encima de $500, redirige esos $400 a BTC en vez de AMD — no compres en máximos.</div>
+        </div>
+        <textarea class="notes-area" placeholder="Notas del Q3..." onchange="saveNote('q3', this.value)" id="notes-q3"></textarea>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quarter-card" data-q="q4">
+      <div class="quarter-header" onclick="toggleQ(this)">
+        <span class="q-label">Q4</span>
+        <span class="q-period">Octubre – Diciembre 2026</span>
+        <span class="q-amount">$1,000</span>
+        <span class="q-status pending">Pendiente</span>
+        <span class="q-chevron">▼</span>
+      </div>
+      <div class="quarter-body">
+        <div class="q-progress">
+          <div class="q-prog-row"><span>Progreso Q4</span><span id="q4-pct">0%</span></div>
+          <div class="q-prog-track"><div class="q-prog-fill" id="q4-bar" style="width:0%"></div></div>
+        </div>
+        <div class="checklist" id="q4-list">
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q4" data-amt="700" data-type="btc">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Acumular BTC — último bloque del año 1</div>
+              <div class="check-sub">Meta: cerrar el año con ~$2,400 en BTC total</div>
+            </div>
+            <div class="check-amount amt-btc">$700 BTC</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q4" data-amt="200" data-type="liq">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Reforzar posición más débil del portafolio</div>
+              <div class="check-sub">Evaluar META vs CRWV vs AMD — entrar en la más rezagada</div>
+            </div>
+            <div class="check-amount amt-liq">$200</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q4" data-amt="100" data-type="liq">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Reservar liquidez para arranque Fase 2</div>
+              <div class="check-sub">Guardar para primer aporte de TSM en Q5</div>
+            </div>
+            <div class="check-amount amt-liq">$100 LIQ</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q4" data-amt="0" data-type="liq">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Revisar y evaluar rendimiento año 1</div>
+              <div class="check-sub">Comparar cada posición vs el plan · decidir ajustes para Fase 2</div>
+            </div>
+            <div class="check-amount amt-liq">Review</div>
+          </div>
+        </div>
+        <div class="tip-block">
+          <div class="tip-title">⚡ Cierre Fase 1</div>
+          <div class="tip-text">Al cerrar Q4 deberías tener <strong>~$2,400 en BTC</strong>, NVDA reforzada, META en 4 acc., y AMD sin tocar o reforzada. Si AMD sigue en +100%, <strong>considera vender 20-30% en Q4</strong> para reinvertir en Fase 2.</div>
+        </div>
+        <textarea class="notes-area" placeholder="Notas del Q4..." onchange="saveNote('q4', this.value)" id="notes-q4"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- FASE 2 -->
+  <div class="phase-block">
+    <div class="phase-title-row">
+      <span class="phase-num">FASE 2</span>
+      <span class="phase-name" style="color:var(--green)">Año 2 — Infraestructura IA + Biotech</span>
+      <span class="phase-total">$4,000</span>
+    </div>
+    <p class="phase-goal">Objetivo: entrar a TSM y XBI/ARKG · romper el 100% tech · BTC a $3,800</p>
+
+    <div class="quarter-card" data-q="q5">
+      <div class="quarter-header" onclick="toggleQ(this)">
+        <span class="q-label">Q5</span>
+        <span class="q-period">Enero – Marzo 2027</span>
+        <span class="q-amount">$1,000</span>
+        <span class="q-status pending">Pendiente</span>
+        <span class="q-chevron">▼</span>
+      </div>
+      <div class="quarter-body">
+        <div class="q-progress">
+          <div class="q-prog-row"><span>Progreso Q5</span><span id="q5-pct">0%</span></div>
+          <div class="q-prog-track"><div class="q-prog-fill" id="q5-bar" style="width:0%"></div></div>
+        </div>
+        <div class="checklist" id="q5-list">
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q5" data-amt="400" data-type="tsm">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Primera compra de TSM — infraestructura IA</div>
+              <div class="check-sub">TSMC fabrica los chips de NVDA y AMD · diversifica sin salir de IA</div>
+            </div>
+            <div class="check-amount amt-tsm">$400 TSM</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q5" data-amt="300" data-type="btc">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Continuar acumulando BTC</div>
+              <div class="check-sub">Meta acumulada al cierre Q5: ~$2,700 en BTC total</div>
+            </div>
+            <div class="check-amount amt-btc">$300 BTC</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q5" data-amt="300" data-type="liq">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Reforzar posición más débil del portafolio</div>
+              <div class="check-sub">Revisar META, CRWV, AMD al inicio del trimestre</div>
+            </div>
+            <div class="check-amount amt-liq">$300</div>
+          </div>
+        </div>
+        <textarea class="notes-area" placeholder="Notas del Q5..." onchange="saveNote('q5', this.value)" id="notes-q5"></textarea>
+      </div>
+    </div>
+
+    <div class="quarter-card" data-q="q6">
+      <div class="quarter-header" onclick="toggleQ(this)">
+        <span class="q-label">Q6</span>
+        <span class="q-period">Abril – Junio 2027</span>
+        <span class="q-amount">$1,000</span>
+        <span class="q-status pending">Pendiente</span>
+        <span class="q-chevron">▼</span>
+      </div>
+      <div class="quarter-body">
+        <div class="q-progress">
+          <div class="q-prog-row"><span>Progreso Q6</span><span id="q6-pct">0%</span></div>
+          <div class="q-prog-track"><div class="q-prog-fill" id="q6-bar" style="width:0%"></div></div>
+        </div>
+        <div class="checklist" id="q6-list">
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q6" data-amt="400" data-type="tsm">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Segunda compra TSM — consolidar posición</div>
+              <div class="check-sub">Promediar si bajó, acumular si sigue alcista</div>
+            </div>
+            <div class="check-amount amt-tsm">$400 TSM</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q6" data-amt="400" data-type="btc">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Continuar acumulando BTC</div>
+              <div class="check-sub">Meta acumulada al cierre Q6: ~$3,100 en BTC total</div>
+            </div>
+            <div class="check-amount amt-btc">$400 BTC</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q6" data-amt="200" data-type="bio">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Primera compra XBI o ARKG — biotech</div>
+              <div class="check-sub">Primer activo fuera de tech · rompe correlación total</div>
+            </div>
+            <div class="check-amount amt-bio">$200 BIO</div>
+          </div>
+        </div>
+        <textarea class="notes-area" placeholder="Notas del Q6..." onchange="saveNote('q6', this.value)" id="notes-q6"></textarea>
+      </div>
+    </div>
+
+    <div class="quarter-card" data-q="q7">
+      <div class="quarter-header" onclick="toggleQ(this)">
+        <span class="q-label">Q7</span>
+        <span class="q-period">Julio – Septiembre 2027</span>
+        <span class="q-amount">$1,000</span>
+        <span class="q-status pending">Pendiente</span>
+        <span class="q-chevron">▼</span>
+      </div>
+      <div class="quarter-body">
+        <div class="q-progress">
+          <div class="q-prog-row"><span>Progreso Q7</span><span id="q7-pct">0%</span></div>
+          <div class="q-prog-track"><div class="q-prog-fill" id="q7-bar" style="width:0%"></div></div>
+        </div>
+        <div class="checklist" id="q7-list">
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q7" data-amt="400" data-type="bio">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Reforzar XBI/ARKG — consolidar posición biotech</div>
+              <div class="check-sub">Segunda compra · construir posición con peso real</div>
+            </div>
+            <div class="check-amount amt-bio">$400 BIO</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q7" data-amt="400" data-type="btc">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Continuar acumulando BTC</div>
+              <div class="check-sub">Meta acumulada al cierre Q7: ~$3,500 en BTC total</div>
+            </div>
+            <div class="check-amount amt-btc">$400 BTC</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q7" data-amt="200" data-type="tsm">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Tercera compra TSM si sigue en rango</div>
+              <div class="check-sub">Omitir si subió más del 30% desde tu entrada</div>
+            </div>
+            <div class="check-amount amt-tsm">$200 TSM</div>
+          </div>
+        </div>
+        <textarea class="notes-area" placeholder="Notas del Q7..." onchange="saveNote('q7', this.value)" id="notes-q7"></textarea>
+      </div>
+    </div>
+
+    <div class="quarter-card" data-q="q8">
+      <div class="quarter-header" onclick="toggleQ(this)">
+        <span class="q-label">Q8</span>
+        <span class="q-period">Octubre – Diciembre 2027</span>
+        <span class="q-amount">$1,000</span>
+        <span class="q-status pending">Pendiente</span>
+        <span class="q-chevron">▼</span>
+      </div>
+      <div class="quarter-body">
+        <div class="q-progress">
+          <div class="q-prog-row"><span>Progreso Q8</span><span id="q8-pct">0%</span></div>
+          <div class="q-prog-track"><div class="q-prog-fill" id="q8-bar" style="width:0%"></div></div>
+        </div>
+        <div class="checklist" id="q8-list">
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q8" data-amt="500" data-type="bio">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Tercera compra XBI/ARKG — posición completa</div>
+              <div class="check-sub">Cerrar posición biotech al nivel deseado</div>
+            </div>
+            <div class="check-amount amt-bio">$500 BIO</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q8" data-amt="300" data-type="btc">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Último bloque BTC del año 2</div>
+              <div class="check-sub">Meta: ~$3,800 en BTC total al cierre Fase 2</div>
+            </div>
+            <div class="check-amount amt-btc">$300 BTC</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q8" data-amt="200" data-type="liq">
+            <div class="check-box"></div>
+            <div class="check-content">
+              <div class="check-main">Reservar liquidez táctica para Fase 3</div>
+              <div class="check-sub">Revisar rendimiento año 2 · preparar rebalanceo</div>
+            </div>
+            <div class="check-amount amt-liq">$200 LIQ</div>
+          </div>
+        </div>
+        <textarea class="notes-area" placeholder="Notas del Q8..." onchange="saveNote('q8', this.value)" id="notes-q8"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- FASE 3 -->
+  <div class="phase-block">
+    <div class="phase-title-row">
+      <span class="phase-num">FASE 3</span>
+      <span class="phase-name" style="color:var(--purple)">Año 3 — Optimizar + tomar ganancias</span>
+      <span class="phase-total">$4,000</span>
+    </div>
+    <p class="phase-goal">Objetivo: rebalancear, tomar ganancias en AMD, BTC a $5,200–6,000</p>
+
+    <div class="quarter-card" data-q="q9">
+      <div class="quarter-header" onclick="toggleQ(this)">
+        <span class="q-label">Q9</span><span class="q-period">Enero – Marzo 2028</span>
+        <span class="q-amount">$1,000</span><span class="q-status pending">Pendiente</span><span class="q-chevron">▼</span>
+      </div>
+      <div class="quarter-body">
+        <div class="q-progress"><div class="q-prog-row"><span>Progreso Q9</span><span id="q9-pct">0%</span></div><div class="q-prog-track"><div class="q-prog-fill" id="q9-bar" style="width:0%"></div></div></div>
+        <div class="checklist" id="q9-list">
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q9" data-amt="500" data-type="liq">
+            <div class="check-box"></div>
+            <div class="check-content"><div class="check-main">Evaluar todo el portafolio — identificar mejor performer</div><div class="check-sub">Reforzar la posición con mayor momentum y convicción</div></div>
+            <div class="check-amount amt-liq">$500</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q9" data-amt="500" data-type="btc">
+            <div class="check-box"></div>
+            <div class="check-content"><div class="check-main">Acumular BTC si sigue en tendencia alcista</div><div class="check-sub">Si BTC corrigió -30%, duplicar la compra este trimestre</div></div>
+            <div class="check-amount amt-btc">$500 BTC</div>
+          </div>
+        </div>
+        <textarea class="notes-area" placeholder="Notas del Q9..." onchange="saveNote('q9', this.value)" id="notes-q9"></textarea>
+      </div>
+    </div>
+
+    <div class="quarter-card" data-q="q10">
+      <div class="quarter-header" onclick="toggleQ(this)">
+        <span class="q-label">Q10</span><span class="q-period">Abril – Junio 2028</span>
+        <span class="q-amount">$1,000</span><span class="q-status pending">Pendiente</span><span class="q-chevron">▼</span>
+      </div>
+      <div class="quarter-body">
+        <div class="q-progress"><div class="q-prog-row"><span>Progreso Q10</span><span id="q10-pct">0%</span></div><div class="q-prog-track"><div class="q-prog-fill" id="q10-bar" style="width:0%"></div></div></div>
+        <div class="checklist" id="q10-list">
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q10" data-amt="0" data-type="amd">
+            <div class="check-box"></div>
+            <div class="check-content"><div class="check-main">Evaluar toma parcial de AMD (20–30%)</div><div class="check-sub">Si AMD supera +150% total, vender una parte y rotar</div></div>
+            <div class="check-amount amt-amd">AMD ↓</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q10" data-amt="600" data-type="btc">
+            <div class="check-box"></div>
+            <div class="check-content"><div class="check-main">Rotar ganancias de AMD a BTC o TSM</div><div class="check-sub">Mover capital de la ganancia más grande al activo con más futuro</div></div>
+            <div class="check-amount amt-btc">$600+</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q10" data-amt="400" data-type="liq">
+            <div class="check-box"></div>
+            <div class="check-content"><div class="check-main">Aporte trimestral a posición más débil</div><div class="check-sub">Usar los $1,000 frescos en lo que más necesite refuerzo</div></div>
+            <div class="check-amount amt-liq">$400</div>
+          </div>
+        </div>
+        <textarea class="notes-area" placeholder="Notas del Q10..." onchange="saveNote('q10', this.value)" id="notes-q10"></textarea>
+      </div>
+    </div>
+
+    <div class="quarter-card" data-q="q11">
+      <div class="quarter-header" onclick="toggleQ(this)">
+        <span class="q-label">Q11</span><span class="q-period">Julio – Septiembre 2028</span>
+        <span class="q-amount">$1,000</span><span class="q-status pending">Pendiente</span><span class="q-chevron">▼</span>
+      </div>
+      <div class="quarter-body">
+        <div class="q-progress"><div class="q-prog-row"><span>Progreso Q11</span><span id="q11-pct">0%</span></div><div class="q-prog-track"><div class="q-prog-fill" id="q11-bar" style="width:0%"></div></div></div>
+        <div class="checklist" id="q11-list">
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q11" data-amt="600" data-type="liq">
+            <div class="check-box"></div>
+            <div class="check-content"><div class="check-main">Reforzar posición con mayor convicción a futuro</div><div class="check-sub">BTC, TSM o la que más momentum tenga rumbo a 2029</div></div>
+            <div class="check-amount amt-liq">$600</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q11" data-amt="400" data-type="liq">
+            <div class="check-box"></div>
+            <div class="check-content"><div class="check-main">Guardar liquidez para rebalanceo final Q12</div><div class="check-sub">No invertir todo — necesitas margen para el cierre del plan</div></div>
+            <div class="check-amount amt-liq">$400 LIQ</div>
+          </div>
+        </div>
+        <textarea class="notes-area" placeholder="Notas del Q11..." onchange="saveNote('q11', this.value)" id="notes-q11"></textarea>
+      </div>
+    </div>
+
+    <div class="quarter-card" data-q="q12">
+      <div class="quarter-header" onclick="toggleQ(this)">
+        <span class="q-label">Q12</span><span class="q-period">Octubre – Diciembre 2028</span>
+        <span class="q-amount">$1,000</span><span class="q-status pending">Pendiente</span><span class="q-chevron">▼</span>
+      </div>
+      <div class="quarter-body">
+        <div class="q-progress"><div class="q-prog-row"><span>Progreso Q12</span><span id="q12-pct">0%</span></div><div class="q-prog-track"><div class="q-prog-fill" id="q12-bar" style="width:0%"></div></div></div>
+        <div class="checklist" id="q12-list">
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q12" data-amt="0" data-type="liq">
+            <div class="check-box"></div>
+            <div class="check-content"><div class="check-main">Rebalanceo final del portafolio completo</div><div class="check-sub">Ninguna posición debe superar el 25% del total</div></div>
+            <div class="check-amount amt-liq">Review</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q12" data-amt="0" data-type="btc">
+            <div class="check-box"></div>
+            <div class="check-content"><div class="check-main">Verificar BTC objetivo: $5,200–6,000 total</div><div class="check-sub">Si falta, usar el aporte para completar</div></div>
+            <div class="check-amount amt-btc">BTC ✓</div>
+          </div>
+          <div class="check-item" onclick="toggleCheck(this)" data-q="q12" data-amt="0" data-type="liq">
+            <div class="check-box"></div>
+            <div class="check-content"><div class="check-main">Definir estrategia para el siguiente ciclo 2029+</div><div class="check-sub">¿Más agresivo? ¿Tomar ganancias? ¿Nuevo plan?</div></div>
+            <div class="check-amount amt-liq">Plan 2029</div>
+          </div>
+        </div>
+        <div class="tip-block">
+          <div class="tip-title">🏁 Cierre del plan de 3 años</div>
+          <div class="tip-text">Si seguiste el plan: portafolio estimado <strong>$35,000–52,000</strong> · BTC acumulado <strong>$5,200–6,000</strong> · 8 posiciones en 4 sectores diferentes. ¡Felicidades!</div>
+        </div>
+        <textarea class="notes-area" placeholder="Notas del Q12 y reflexión final..." onchange="saveNote('q12', this.value)" id="notes-q12"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- REGLAS -->
+  <div class="rules-block">
+    <div class="rules-title">📋 Reglas de oro — no negociables</div>
+    <div class="rule-item"><span class="rule-num">01</span><span class="rule-text"><strong>BTC siempre en DCA.</strong> No intentes adivinar el precio. $X por trimestre sin importar si subió o bajó.</span></div>
+    <div class="rule-item"><span class="rule-num">02</span><span class="rule-text"><strong>Nunca más del 25% en un solo activo.</strong> Si AMD o BTC crecen y superan ese umbral, rebalancea.</span></div>
+    <div class="rule-item"><span class="rule-num">03</span><span class="rule-text"><strong>AMD en +150%: vende 30%.</strong> No seas codicioso. Rota las ganancias grandes a activos con más futuro.</span></div>
+    <div class="rule-item"><span class="rule-num">04</span><span class="rule-text"><strong>Guarda $100–200 de liquidez por trimestre.</strong> Las mejores oportunidades aparecen en correcciones del 20%+.</span></div>
+    <div class="rule-item"><span class="rule-num">05</span><span class="rule-text"><strong>No mires el portafolio todos los días.</strong> Revísalo una vez por semana máximo. El ruido diario destruye la disciplina.</span></div>
+    <div class="rule-item"><span class="rule-num">06</span><span class="rule-text"><strong>BTC en wallet propia si supera $3,000.</strong> No dejes todo en el exchange. Tu experiencia en crypto ya lo sabe.</span></div>
+    <div class="rule-item"><span class="rule-num">07</span><span class="rule-text"><strong>Si una acción cae -40% sin razón fundamental, reevalúa.</strong> No "holdees" por orgullo. Evalúa fríamente.</span></div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="export-row">
+    <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+    <button class="btn btn-secondary" onclick="exportJSON()">Exportar progreso (JSON)</button>
+    <button class="btn btn-secondary" onclick="resetAll()">Reiniciar checklist</button>
+  </div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'inv_strategy_2026';
+
+function getState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+}
+function saveState(s) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {}
+}
+
+function toggleQ(header) {
+  const card = header.closest('.quarter-card');
+  card.classList.toggle('open');
+}
+
+function toggleCheck(item) {
+  item.classList.toggle('checked');
+  const q = item.dataset.q;
+  updateQProgress(q);
+  updateGlobal();
+  persistChecks();
+}
+
+function updateQProgress(q) {
+  const list = document.getElementById(q + '-list');
+  if (!list) return;
+  const items = list.querySelectorAll('.check-item');
+  const done = list.querySelectorAll('.check-item.checked').length;
+  const pct = items.length ? Math.round((done / items.length) * 100) : 0;
+  const bar = document.getElementById(q + '-bar');
+  const pctEl = document.getElementById(q + '-pct');
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+
+  const card = list.closest('.quarter-card');
+  if (card && pct === 100) {
+    card.querySelector('.q-status').className = 'q-status done';
+    card.querySelector('.q-status').textContent = 'Completado';
+    card.classList.add('completed');
+    card.classList.remove('active');
+  }
+}
+
+function updateGlobal() {
+  const allItems = document.querySelectorAll('.check-item');
+  const done = document.querySelectorAll('.check-item.checked').length;
+  const pct = allItems.length ? Math.round((done / allItems.length) * 100) : 0;
+  document.getElementById('global-bar').style.width = pct + '%';
+  document.getElementById('global-pct').textContent = pct + '%';
+}
+
+function persistChecks() {
+  const state = getState();
+  state.checks = {};
+  document.querySelectorAll('.check-item').forEach((item, i) => {
+    state.checks[i] = item.classList.contains('checked');
+  });
+  saveState(state);
+}
+
+function saveNote(q, val) {
+  const state = getState();
+  if (!state.notes) state.notes = {};
+  state.notes[q] = val;
+  saveState(state);
+}
+
+function exportJSON() {
+  const state = getState();
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'estrategia_inversion_progreso.json';
+  a.click();
+}
+
+function resetAll() {
+  if (!confirm('¿Reiniciar todo el progreso? Esta acción no se puede deshacer.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  document.querySelectorAll('.check-item.checked').forEach(i => i.classList.remove('checked'));
+  ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12'].forEach(q => updateQProgress(q));
+  updateGlobal();
+}
+
+function loadState() {
+  const state = getState();
+  if (state.checks) {
+    const items = document.querySelectorAll('.check-item');
+    items.forEach((item, i) => {
+      if (state.checks[i]) item.classList.add('checked');
+    });
+  }
+  if (state.notes) {
+    Object.keys(state.notes).forEach(q => {
+      const el = document.getElementById('notes-' + q);
+      if (el) el.value = state.notes[q];
+    });
+  }
+  ['q1','q2','q3','q4','q5','q6','q7','q8','q9','q10','q11','q12'].forEach(q => updateQProgress(q));
+  updateGlobal();
+}
+
+loadState();
+
+// ─── TAB SWITCHING ─────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelector(`[onclick="switchTab('${name}')"]`).classList.add('active');
+  if (name === 'portafolio') { loadPortfolio(); setTimeout(recalculate, 50); }
+}
+
+// ─── CHART.JS LOAD ──────────────────────────────────────────────
+let chartJsLoaded = false;
+let charts = {};
+function loadChartJs(cb) {
+  if (chartJsLoaded) { cb(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+  s.onload = () => { chartJsLoaded = true; cb(); };
+  document.head.appendChild(s);
+}
+
+// ─── PORTFOLIO DATA ──────────────────────────────────────────────
+const DEFAULT_POSITIONS = [
+  { ticker:'AMD',  sector:'Semiconductores', bought:15,         avgBuy:224,      current:465.1,    sold:1,      avgSell:354.77, stopLoss:380, target:600 },
+  { ticker:'NVDA', sector:'Chips IA',        bought:12,         avgBuy:178.48,   current:221,      sold:0,      avgSell:0,      stopLoss:160, target:340 },
+  { ticker:'META', sector:'Social IA',       bought:4,          avgBuy:637.40,   current:602.21,   sold:0,      avgSell:0,      stopLoss:520, target:780 },
+  { ticker:'CRWV', sector:'Cloud IA',        bought:14,         avgBuy:89,       current:115.18,   sold:2,      avgSell:128.7,  stopLoss:85,  target:180 },
+  { ticker:'BTC',  sector:'Crypto',          bought:0.00216832, avgBuy:79899.51, current:79105.73, sold:0,      avgSell:0,      stopLoss:60000, target:135000 },
+  { ticker:'XRP',  sector:'Crypto',          bought:736.76,     avgBuy:1.454,    current:1.41,     sold:361.32, avgSell:1.396,  stopLoss:1.0, target:2.47 },
+  { ticker:'ADBE', sector:'Software',        bought:1.9,        avgBuy:292.82,   current:246.8,    sold:1.9,    avgSell:241,    stopLoss:0,   target:0 },
+  { ticker:'MU',   sector:'Semiconductores', bought:2,          avgBuy:284,      current:791,      sold:2,      avgSell:398,    stopLoss:0,   target:0 },
+];
+
+const DEFAULT_HISTORY = [
+  { date:'2026-01-01', ticker:'AMD',  type:'Compra',  qty:14,   price:224,    notes:'Posición inicial' },
+  { date:'2026-03-03', ticker:'XRP',  type:'Compra',  qty:228.77, price:1.454, notes:'Compra XRP 5,500 MXN' },
+  { date:'2026-03-13', ticker:'XRP',  type:'Compra',  qty:196.50, price:1.454, notes:'Compra XRP 5,000 MXN' },
+  { date:'2026-03-30', ticker:'XRP',  type:'Venta',   qty:270,  price:1.396,  notes:'Venta XRP 6,392 MXN' },
+  { date:'2026-04-26', ticker:'XRP',  type:'Compra',  qty:311.48, price:1.454, notes:'Conversión 8,000 MXN' },
+  { date:'2026-05-04', ticker:'XRP',  type:'Venta',   qty:49.82, price:1.396, notes:'Venta XRP 1,200 MXN' },
+  { date:'2026-05-05', ticker:'XRP',  type:'Venta',   qty:41.50, price:1.396, notes:'Venta XRP 1,000 MXN' },
+  { date:'2026-05-11', ticker:'META', type:'Compra',  qty:1,    price:604,    notes:'Rotación de ADBE' },
+  { date:'2026-05-11', ticker:'ADBE', type:'Venta',   qty:1.9,  price:241,    notes:'Rotación a META' },
+  { date:'2026-05-11', ticker:'NVDA', type:'Compra',  qty:1.35, price:221,    notes:'Refuerzo Q1' },
+  { date:'2026-05-13', ticker:'BTC',  type:'Compra',  qty:0.00216832, price:79899.51, notes:'3,000 MXN → BTC' },
+];
+
+const PCOLORS = {AMD:'#E24B4A',NVDA:'#378ADD',META:'#7F77DD',CRWV:'#1D9E75',BTC:'#F7931A',XRP:'#346AA9',ADBE:'#E86532',MU:'#888780'};
+const SECTOR_COLORS = {'Semiconductores':'#E24B4A','Chips IA':'#378ADD','Social IA':'#7F77DD','Cloud IA':'#1D9E75','Crypto':'#F7931A','Software':'#E86532'};
+
+let positions = [];
+let history = [];
+
+function loadPortfolio() {
+  try {
+    const s = getState();
+    positions = s.positions ? JSON.parse(JSON.stringify(s.positions)) : JSON.parse(JSON.stringify(DEFAULT_POSITIONS));
+    history   = s.history   ? JSON.parse(JSON.stringify(s.history))   : JSON.parse(JSON.stringify(DEFAULT_HISTORY));
+  } catch(e) {
+    positions = JSON.parse(JSON.stringify(DEFAULT_POSITIONS));
+    history   = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
+  }
+  renderEditor();
+  renderHistory();
+}
+
+function savePortfolio() {
+  const s = getState();
+  s.positions = positions;
+  s.history   = history;
+  saveState(s);
+}
+
+// ─── EDITOR ─────────────────────────────────────────────────────
+function renderEditor() {
+  const tbody = document.getElementById('pos-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  positions.forEach((p, i) => {
+    const open = (p.bought - p.sold) > 0.000001;
+    const badge = open ? '<span class="pos-status pos-open">Abierta</span>' : '<span class="pos-status pos-closed">Cerrada</span>';
+    tbody.innerHTML += `<tr>
+      <td><input class="pos-input" style="font-weight:700;width:75px;color:${PCOLORS[p.ticker]||'inherit'};" value="${p.ticker}" onchange="positions[${i}].ticker=this.value"></td>
+      <td><input class="pos-input" style="width:110px;" value="${p.sector||''}" onchange="positions[${i}].sector=this.value"></td>
+      <td><input class="pos-input" type="number" value="${p.bought}" onchange="positions[${i}].bought=parseFloat(this.value)||0"></td>
+      <td><input class="pos-input" type="number" value="${p.avgBuy}" onchange="positions[${i}].avgBuy=parseFloat(this.value)||0"></td>
+      <td><input class="pos-input" type="number" value="${p.current}" onchange="positions[${i}].current=parseFloat(this.value)||0" style="border-color:rgba(77,159,255,0.5);background:rgba(77,159,255,0.05);"></td>
+      <td><input class="pos-input" type="number" value="${p.sold}" onchange="positions[${i}].sold=parseFloat(this.value)||0"></td>
+      <td><input class="pos-input" type="number" value="${p.avgSell}" onchange="positions[${i}].avgSell=parseFloat(this.value)||0"></td>
+      <td><input class="pos-input" type="number" value="${p.stopLoss||0}" onchange="positions[${i}].stopLoss=parseFloat(this.value)||0" style="border-color:rgba(255,92,106,0.3);"></td>
+      <td><input class="pos-input" type="number" value="${p.target||0}" onchange="positions[${i}].target=parseFloat(this.value)||0" style="border-color:rgba(0,217,126,0.3);"></td>
+      <td>${badge} <button onclick="positions.splice(${i},1);renderEditor();" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 4px;">×</button></td>
+    </tr>`;
+  });
+}
+
+function addRow() {
+  positions.push({ticker:'NUEVO',sector:'Tech',bought:0,avgBuy:0,current:0,sold:0,avgSell:0,stopLoss:0,target:0});
+  renderEditor();
+}
+
+function resetPortfolio() {
+  if (!confirm('¿Restablecer posiciones base?')) return;
+  positions = JSON.parse(JSON.stringify(DEFAULT_POSITIONS));
+  history   = JSON.parse(JSON.stringify(DEFAULT_HISTORY));
+  renderEditor(); renderHistory(); recalculate();
+}
+
+// ─── HISTORY ────────────────────────────────────────────────────
+function renderHistory() {
+  const tbody = document.getElementById('hist-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  [...history].reverse().forEach((h, ri) => {
+    const i = history.length - 1 - ri;
+    const typeColor = h.type==='Compra' ? 'var(--green)' : h.type==='Venta' ? 'var(--red)' : 'var(--blue)';
+    const total = ((h.qty||0)*(h.price||0)).toFixed(2);
+    tbody.innerHTML += `<tr>
+      <td><input class="pos-input" type="date" value="${h.date||''}" onchange="history[${i}].date=this.value" style="width:120px;"></td>
+      <td><input class="pos-input" value="${h.ticker||''}" onchange="history[${i}].ticker=this.value" style="width:70px;font-weight:600;color:${PCOLORS[h.ticker]||'inherit'};"></td>
+      <td><select class="pos-input" onchange="history[${i}].type=this.value" style="width:90px;color:${typeColor};">
+        <option ${h.type==='Compra'?'selected':''} style="color:var(--green)">Compra</option>
+        <option ${h.type==='Venta'?'selected':''} style="color:var(--red)">Venta</option>
+        <option ${h.type==='Conversión'?'selected':''} style="color:var(--blue)">Conversión</option>
+      </select></td>
+      <td><input class="pos-input" type="number" value="${h.qty||0}" onchange="history[${i}].qty=parseFloat(this.value)||0" style="width:100px;"></td>
+      <td><input class="pos-input" type="number" value="${h.price||0}" onchange="history[${i}].price=parseFloat(this.value)||0" style="width:100px;"></td>
+      <td style="font-family:monospace;font-size:11px;color:var(--muted);padding:6px;">$${parseFloat(total).toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+      <td><input class="pos-input" value="${h.notes||''}" onchange="history[${i}].notes=this.value" style="width:160px;"></td>
+      <td><button onclick="history.splice(${i},1);renderHistory();" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;">×</button></td>
+    </tr>`;
+  });
+}
+
+function addHistRow() {
+  history.push({date:new Date().toISOString().split('T')[0],ticker:'',type:'Compra',qty:0,price:0,notes:''});
+  renderHistory();
+}
+
+// ─── FORMATTERS ──────────────────────────────────────────────────
+const usdFmt = n => '$' + (n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pctFmt = n => (n>=0?'+':'')+((n||0).toFixed(2))+'%';
+const colG = s => `<span style="color:var(--green)">${s}</span>`;
+const colR = s => `<span style="color:var(--red)">${s}</span>`;
+const colV = (v,s) => v>=0 ? colG(s) : colR(s);
+
+// ─── CHART HELPERS ───────────────────────────────────────────────
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+const CHART_DEFAULTS = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false }, tooltip: { backgroundColor:'rgba(17,17,24,0.95)', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, titleFont:{family:'DM Mono',size:11}, bodyFont:{family:'DM Mono',size:11}, padding:10 } },
+};
+
+// ─── MAIN RECALCULATE ────────────────────────────────────────────
+function recalculate() {
+  // Sync inputs → positions
+  document.querySelectorAll('#pos-body tr').forEach((row,i) => {
+    const inp = row.querySelectorAll('input');
+    if (inp.length>=9 && positions[i]) {
+      positions[i].ticker    = inp[0].value;
+      positions[i].sector    = inp[1].value;
+      positions[i].bought    = parseFloat(inp[2].value)||0;
+      positions[i].avgBuy    = parseFloat(inp[3].value)||0;
+      positions[i].current   = parseFloat(inp[4].value)||0;
+      positions[i].sold      = parseFloat(inp[5].value)||0;
+      positions[i].avgSell   = parseFloat(inp[6].value)||0;
+      positions[i].stopLoss  = parseFloat(inp[7].value)||0;
+      positions[i].target    = parseFloat(inp[8].value)||0;
+    }
+  });
+  savePortfolio();
+
+  // Compute
+  let totCost=0, totVal=0, totLiq=0, totReal=0;
+  const dets = positions.map(p => {
+    const open = Math.max(0, p.bought - p.sold);
+    const costO = open * p.avgBuy, valO = open * p.current;
+    const plO = valO - costO, rendO = costO>0?(plO/costO)*100:0;
+    const liq = p.sold * p.avgSell;
+    const plR = p.sold>0 ? (p.sold*p.avgSell)-(p.sold*p.avgBuy) : 0;
+    const t70 = p.avgBuy * 1.70;
+    const f70 = p.current>0 ? ((t70-p.current)/p.current)*100 : null;
+    const stopPct = (p.stopLoss&&p.current) ? ((p.stopLoss-p.current)/p.current)*100 : null;
+    const tgtPct  = (p.target&&p.current)   ? ((p.target-p.current)/p.current)*100   : null;
+    if(open>0){totCost+=costO; totVal+=valO;}
+    totLiq+=liq; totReal+=plR;
+    return {...p, open, costO, valO, plO, rendO, liq, plR, t70, f70, stopPct, tgtPct};
+  });
+
+  const unreal=totVal-totCost, unrealPct=totCost>0?(unreal/totCost)*100:0;
+  const totPL=unreal+totReal, totPLPct=totCost>0?(totPL/totCost)*100:0;
+  const realPct=totCost>0?(totReal/totCost)*100:0;
+  const openPos = dets.filter(d=>d.open>0.000001).sort((a,b)=>b.valO-a.valO);
+
+  // Sharpe approx (return / avg abs rendition as vol proxy)
+  const rets = openPos.map(d=>d.rendO);
+  const avgRet = rets.length ? rets.reduce((a,b)=>a+b,0)/rets.length : 0;
+  const vol = rets.length>1 ? Math.sqrt(rets.map(r=>Math.pow(r-avgRet,2)).reduce((a,b)=>a+b,0)/(rets.length-1)) : 1;
+  const sharpe = vol>0 ? (avgRet/vol).toFixed(2) : '—';
+
+  // ── KPIs ─────────────────────────────────────────────────────
+  document.getElementById('kpi-cost').textContent = usdFmt(totCost);
+  document.getElementById('kpi-value').textContent = usdFmt(totVal);
+  document.getElementById('kpi-unreal').innerHTML = colV(unreal, usdFmt(unreal));
+  document.getElementById('kpi-unreal-pct').innerHTML = colV(unrealPct, 'Rendimiento: '+pctFmt(unrealPct));
+  document.getElementById('kpi-total').innerHTML = colV(totPL, usdFmt(totPL));
+  document.getElementById('kpi-total-pct').innerHTML = colV(totPLPct, 'Total: '+pctFmt(totPLPct));
+  document.getElementById('kpi-liq').textContent = usdFmt(totLiq);
+  document.getElementById('kpi-real').innerHTML = colV(totReal, usdFmt(totReal));
+  document.getElementById('kpi-real-pct').innerHTML = colV(realPct, 'Realizado: '+pctFmt(realPct));
+  document.getElementById('kpi-sharpe').textContent = sharpe;
+  if (openPos.length) {
+    const top = openPos[0], tw = totVal>0?(top.valO/totVal)*100:0;
+    document.getElementById('kpi-top').textContent = top.ticker;
+    document.getElementById('kpi-top-pct').textContent = 'Peso: '+tw.toFixed(1)+'%';
+  }
+  document.getElementById('donut-total').textContent = usdFmt(totVal);
+
+  loadChartJs(() => { renderCharts(dets, openPos, totVal, unreal, unrealPct); });
+  renderDetailTable(dets, totVal);
+  renderAlerts(openPos, totVal, totReal, totLiq);
+  renderSync(dets);
+  renderProgressBars(openPos, totVal);
+}
+
+// ─── CHARTS ──────────────────────────────────────────────────────
+function renderCharts(dets, openPos, totVal, unreal, unrealPct) {
+  const dark = 'rgba(255,255,255,0.06)';
+
+  // 1. DONUT
+  destroyChart('donut');
+  const dEl = document.getElementById('chart-donut');
+  if (dEl && openPos.length) {
+    const labels = openPos.map(d=>d.ticker);
+    const data   = openPos.map(d=>parseFloat(d.valO.toFixed(2)));
+    const colors = openPos.map(d=>PCOLORS[d.ticker]||'#888');
+    charts['donut'] = new Chart(dEl, { type:'doughnut', data:{ labels, datasets:[{ data, backgroundColor:colors, borderColor:'#0a0a0f', borderWidth:3, hoverOffset:8 }] },
+      options:{ ...CHART_DEFAULTS, cutout:'68%', plugins:{ ...CHART_DEFAULTS.plugins, tooltip:{ ...CHART_DEFAULTS.plugins.tooltip,
+        callbacks:{ label: ctx => ` ${ctx.label}: ${usdFmt(ctx.parsed)} (${(ctx.parsed/totVal*100).toFixed(1)}%)` } } } } });
+    // Legend
+    const leg = document.getElementById('donut-legend');
+    if(leg){ leg.innerHTML=''; openPos.forEach(d=>{ const w=(d.valO/totVal*100).toFixed(1); leg.innerHTML+=`<span style="display:flex;align-items:center;gap:4px;font-size:11px;font-family:monospace;"><span style="width:8px;height:8px;border-radius:50%;background:${PCOLORS[d.ticker]||'#888'};flex-shrink:0;"></span>${d.ticker} ${w}%</span>`; }); }
+  }
+
+  // 2. BAR P/L
+  destroyChart('pl');
+  const plEl = document.getElementById('chart-pl');
+  if (plEl && openPos.length) {
+    const labels = openPos.map(d=>d.ticker);
+    const data   = openPos.map(d=>parseFloat(d.plO.toFixed(2)));
+    const colors = data.map(v => v>=0 ? 'rgba(0,217,126,0.8)' : 'rgba(255,92,106,0.8)');
+    const borders= data.map(v => v>=0 ? '#00d97e' : '#ff5c6a');
+    charts['pl'] = new Chart(plEl, { type:'bar', data:{ labels, datasets:[{ label:'P/L $', data, backgroundColor:colors, borderColor:borders, borderWidth:1, borderRadius:4 }] },
+      options:{ ...CHART_DEFAULTS, scales:{
+        x:{ ticks:{color:'#6b6b80',font:{family:'DM Mono',size:10}}, grid:{color:dark} },
+        y:{ ticks:{color:'#6b6b80',font:{family:'DM Mono',size:10},callback:v=>'$'+v.toLocaleString()}, grid:{color:dark} }
+      }, plugins:{ ...CHART_DEFAULTS.plugins, tooltip:{ ...CHART_DEFAULTS.plugins.tooltip, callbacks:{ label: ctx=>' '+usdFmt(ctx.parsed.y) } } } } });
+  }
+
+  // 3. HORIZONTAL BAR RENDIMIENTO
+  destroyChart('rend');
+  const rEl = document.getElementById('chart-rend');
+  if (rEl && openPos.length) {
+    const sorted = [...openPos].sort((a,b)=>b.rendO-a.rendO);
+    const labels = sorted.map(d=>d.ticker);
+    const data   = sorted.map(d=>parseFloat(d.rendO.toFixed(2)));
+    const colors = data.map(v => v>=0 ? 'rgba(0,217,126,0.75)' : 'rgba(255,92,106,0.75)');
+    charts['rend'] = new Chart(rEl, { type:'bar', data:{ labels, datasets:[{ label:'Rendimiento %', data, backgroundColor:colors, borderRadius:4, borderSkipped:false }] },
+      options:{ ...CHART_DEFAULTS, indexAxis:'y', scales:{
+        x:{ ticks:{color:'#6b6b80',font:{family:'DM Mono',size:10},callback:v=>v+'%'}, grid:{color:dark} },
+        y:{ ticks:{color:'#6b6b80',font:{family:'DM Mono',size:10}}, grid:{color:'transparent'} }
+      }, plugins:{ ...CHART_DEFAULTS.plugins, tooltip:{ ...CHART_DEFAULTS.plugins.tooltip, callbacks:{ label: ctx=>' '+pctFmt(ctx.parsed.x) } } } } });
+  }
+
+  // 4. GAUGE HEALTH
+  destroyChart('health');
+  const hEl = document.getElementById('chart-health');
+  if (hEl) {
+    // Score 0-100: based on diversification, pos positions, no overweight
+    let score = 50;
+    const nPos = openPos.length;
+    if(nPos>=6) score+=15; else if(nPos>=4) score+=8;
+    const posCount = openPos.filter(d=>d.rendO>0).length;
+    score += Math.min(25, posCount*5);
+    const maxW = openPos.length ? Math.max(...openPos.map(d=>totVal>0?(d.valO/totVal)*100:0)) : 100;
+    if(maxW<25) score+=10; else if(maxW>40) score-=15;
+    if(unrealPct>20) score+=10; else if(unrealPct<0) score-=20;
+    score = Math.max(0, Math.min(100, score));
+    const scoreColor = score>=70?'#00d97e':score>=40?'#ffb830':'#ff5c6a';
+    const scoreLabel = score>=70?'Saludable':score>=40?'Moderado':'En riesgo';
+    const gaugeData = [score, 100-score];
+    charts['health'] = new Chart(hEl, { type:'doughnut', data:{ datasets:[{ data:gaugeData, backgroundColor:[scoreColor,'rgba(255,255,255,0.04)'], borderColor:['#0a0a0f','#0a0a0f'], borderWidth:3, circumference:180, rotation:270 }] },
+      options:{ ...CHART_DEFAULTS, cutout:'72%', plugins:{ ...CHART_DEFAULTS.plugins, tooltip:{ enabled:false } } } });
+    const sc = document.getElementById('health-score');
+    const sl = document.getElementById('health-label');
+    if(sc){ sc.textContent=Math.round(score); sc.style.color=scoreColor; }
+    if(sl){ sl.textContent=scoreLabel; }
+  }
+
+  // 5. SECTOR PIE
+  destroyChart('sector');
+  const secEl = document.getElementById('chart-sector');
+  if (secEl && openPos.length) {
+    const sectorMap = {};
+    openPos.forEach(d=>{ const s=d.sector||'Otros'; sectorMap[s]=(sectorMap[s]||0)+d.valO; });
+    const secLabels = Object.keys(sectorMap);
+    const secData   = secLabels.map(s=>parseFloat(sectorMap[s].toFixed(2)));
+    const secColors = secLabels.map(s=>SECTOR_COLORS[s]||'#888');
+    charts['sector'] = new Chart(secEl, { type:'pie', data:{ labels:secLabels, datasets:[{ data:secData, backgroundColor:secColors, borderColor:'#0a0a0f', borderWidth:2, hoverOffset:6 }] },
+      options:{ ...CHART_DEFAULTS, plugins:{ ...CHART_DEFAULTS.plugins, legend:{ display:true, position:'right', labels:{ color:'#6b6b80', font:{family:'DM Mono',size:9}, boxWidth:10, padding:8 } },
+        tooltip:{ ...CHART_DEFAULTS.plugins.tooltip, callbacks:{ label: ctx=>` ${ctx.label}: ${usdFmt(ctx.parsed)} (${(ctx.parsed/totVal*100).toFixed(1)}%)` } } } } });
+  }
+
+  // 6. WATERFALL
+  destroyChart('waterfall');
+  const wfEl = document.getElementById('chart-waterfall');
+  if (wfEl && openPos.length) {
+    const labels = ['Costo total', ...openPos.map(d=>d.ticker), 'Valor total'];
+    const gains  = openPos.filter(d=>d.plO>0).reduce((a,d)=>a+d.plO,0);
+    const losses = openPos.filter(d=>d.plO<0).reduce((a,d)=>a+d.plO,0);
+    const baseData   = [totCost_wf=openPos.reduce((a,d)=>a+d.costO,0), ...openPos.map(()=>0), 0];
+    const gainData   = [0, ...openPos.map(d=>d.plO>0?d.plO:0), 0];
+    const lossData   = [0, ...openPos.map(d=>d.plO<0?Math.abs(d.plO):0), 0];
+    const totalData  = [0, ...openPos.map(()=>0), openPos.reduce((a,d)=>a+d.valO,0)];
+    charts['waterfall'] = new Chart(wfEl, { type:'bar',
+      data:{ labels, datasets:[
+        { label:'Base', data:baseData, backgroundColor:'rgba(255,255,255,0.0)', borderWidth:0, stack:'s' },
+        { label:'Ganancia', data:gainData, backgroundColor:'rgba(0,217,126,0.75)', borderRadius:{topLeft:4,topRight:4}, stack:'s' },
+        { label:'Pérdida', data:lossData, backgroundColor:'rgba(255,92,106,0.75)', borderRadius:{topLeft:4,topRight:4}, stack:'s' },
+        { label:'Total', data:totalData, backgroundColor:'rgba(77,159,255,0.75)', borderRadius:{topLeft:4,topRight:4}, stack:'s' },
+      ] },
+      options:{ ...CHART_DEFAULTS, scales:{
+        x:{ ticks:{color:'#6b6b80',font:{family:'DM Mono',size:9}}, grid:{color:dark} },
+        y:{ ticks:{color:'#6b6b80',font:{family:'DM Mono',size:9},callback:v=>'$'+Math.round(v/1000)+'k'}, grid:{color:dark} }
+      }, plugins:{ ...CHART_DEFAULTS.plugins, legend:{ display:false }, tooltip:{ ...CHART_DEFAULTS.plugins.tooltip, callbacks:{ label: ctx=>` ${ctx.dataset.label}: ${usdFmt(ctx.parsed.y)}` } } } } });
+  }
+}
+
+// ─── PROGRESS BARS +70% ──────────────────────────────────────────
+function renderProgressBars(openPos, totVal) {
+  const el = document.getElementById('progress-bars-list');
+  if (!el) return;
+  el.innerHTML = '';
+  openPos.forEach(d => {
+    const pct70 = Math.min(100, Math.max(0, d.rendO/70*100));
+    const color = d.rendO>=70 ? 'var(--green)' : d.rendO>=35 ? 'var(--amber)' : d.rendO<0 ? 'var(--red)' : 'var(--blue)';
+    el.innerHTML += `<div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+        <span style="font-family:monospace;font-weight:600;color:${PCOLORS[d.ticker]||'inherit'};">${d.ticker}</span>
+        <span style="font-family:monospace;color:${color};">${pctFmt(d.rendO)} / +70%</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.05);border-radius:100px;height:6px;overflow:hidden;">
+        <div style="width:${pct70}%;height:100%;background:${color};border-radius:100px;transition:width 0.6s ease;"></div>
+      </div>
+    </div>`;
+  });
+}
+
+// ─── DETAIL TABLE ────────────────────────────────────────────────
+function renderDetailTable(dets, totVal) {
+  const dtEl = document.getElementById('detail-body');
+  if (!dtEl) return;
+  dtEl.innerHTML = '';
+  dets.forEach(d => {
+    const closed = d.open < 0.000001;
+    const c = PCOLORS[d.ticker] || 'var(--text)';
+    const w = totVal>0 && !closed ? (d.valO/totVal)*100 : 0;
+    const sem = closed ? '<span class="semaforo sem-closed">Cerrada</span>'
+      : w>25 ? '<span class="semaforo sem-over">Sobrepeso</span>'
+      : d.rendO>=70 ? '<span class="semaforo sem-hold">Meta ✓</span>'
+      : d.rendO<-10 ? '<span class="semaforo sem-watch">Vigilar</span>'
+      : '<span class="semaforo sem-hold">Mantener</span>';
+    const f70s = closed?'—': d.f70===null?'—': d.f70<=0?colG('Meta ✓'):`+${d.f70.toFixed(1)}%`;
+    const stopS = (!closed&&d.stopLoss&&d.stopPct!==null) ? `<span style="color:var(--red);font-size:10px;">${usdFmt(d.stopLoss)} (${d.stopPct.toFixed(1)}%)</span>` : '—';
+    const tgtS  = (!closed&&d.target&&d.tgtPct!==null)   ? `<span style="color:var(--green);font-size:10px;">${usdFmt(d.target)} (+${d.tgtPct.toFixed(1)}%)</span>` : '—';
+    dtEl.innerHTML += `<tr>
+      <td style="color:${c};font-weight:700;">${d.ticker}</td>
+      <td>${d.open.toFixed(4)}</td>
+      <td>${closed?'—':usdFmt(d.costO)}</td>
+      <td>${closed?'—':usdFmt(d.valO)}</td>
+      <td style="color:${d.plO>=0?'var(--green)':'var(--red)'}">${closed?'—':usdFmt(d.plO)}</td>
+      <td style="color:${d.rendO>=0?'var(--green)':'var(--red)'}">${closed?'—':pctFmt(d.rendO)}</td>
+      <td style="color:var(--blue)">${d.liq>0?usdFmt(d.liq):'—'}</td>
+      <td style="color:${d.plR>=0?'var(--green)':'var(--red)'}">${d.plR!==0?usdFmt(d.plR):'—'}</td>
+      <td>${stopS}</td>
+      <td>${tgtS}</td>
+      <td>${f70s}</td>
+      <td style="color:var(--muted)">${closed?'—':w.toFixed(1)+'%'}</td>
+      <td>${sem}</td>
+    </tr>`;
+  });
+}
+
+// ─── ALERTS ──────────────────────────────────────────────────────
+function renderAlerts(openPos, totVal, totReal, totLiq) {
+  const el = document.getElementById('alerts-list');
+  if (!el) return;
+  el.innerHTML = '';
+  const alerts = [];
+  openPos.forEach(d => {
+    const w = totVal>0 ? (d.valO/totVal)*100 : 0;
+    if(w>25)   alerts.push({c:'#ff5c6a', t:d.ticker+': sobrepeso fuerte', s:`Pesa ${w.toFixed(1)}%. Regla #2: no superar 25%. Rebalancear.`});
+    else if(w>18) alerts.push({c:'#ffb830', t:d.ticker+': peso elevado', s:`Pesa ${w.toFixed(1)}%. Monitorear de cerca.`});
+    if(d.rendO>=70) alerts.push({c:'#00d97e', t:d.ticker+': objetivo +70% cumplido ✓', s:`Rendimiento: ${pctFmt(d.rendO)}. Considera venta parcial para asegurar utilidad.`});
+    if(d.rendO<-15) alerts.push({c:'#ff5c6a', t:d.ticker+': pérdida significativa', s:`${pctFmt(d.rendO)} en posición abierta. Revisar tesis de inversión.`});
+    if(d.stopLoss && d.current <= d.stopLoss*1.05 && d.current > 0) alerts.push({c:'#ff5c6a', t:d.ticker+': cerca del stop loss', s:`Precio actual ${usdFmt(d.current)} cerca del stop ${usdFmt(d.stopLoss)}.`});
+    if(d.target && d.current >= d.target*0.95 && d.target>0) alerts.push({c:'#00d97e', t:d.ticker+': cerca del objetivo de precio', s:`Precio actual ${usdFmt(d.current)} cerca del objetivo ${usdFmt(d.target)}.`});
+  });
+  if(totReal>0) alerts.push({c:'#00d97e', t:'Utilidad realizada positiva', s:`${usdFmt(totLiq)} de liquidez y ${usdFmt(totReal)} de utilidad realizada acumulada.`});
+  if(!alerts.length) el.innerHTML='<div style="font-size:13px;color:var(--muted);padding:12px 0;">Sin alertas activas · Portafolio en orden ✓</div>';
+  alerts.forEach(a => { el.innerHTML+=`<div class="alert-item"><div class="alert-dot" style="background:${a.c};margin-top:4px;"></div><div><div class="alert-title" style="font-size:13px;">${a.t}</div><div class="alert-sub">${a.s}</div></div></div>`; });
+}
+
+// ─── SYNC WITH STRATEGY ──────────────────────────────────────────
+function renderSync(dets) {
+  const el = document.getElementById('sync-checklist');
+  if (!el) return;
+  const nvda = dets.find(d=>d.ticker==='NVDA'), btc = dets.find(d=>d.ticker==='BTC');
+  const nvdaOk = nvda && nvda.costO >= 600, btcOk = btc && btc.costO >= 1100;
+  const row = (ok, label, curr, target) => `<div class="pf-row" style="font-size:12px;">
+    <span style="width:18px;height:18px;border-radius:50%;background:${ok?'var(--green-dim)':'var(--amber-dim)'};color:${ok?'var(--green)':'var(--amber)'};display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;">${ok?'✓':'!'}</span>
+    <span style="flex:1;color:var(--muted);">${label}</span>
+    <span style="font-family:monospace;font-size:11px;color:${ok?'var(--green)':'var(--amber)'};">${curr} / ${target}</span>
+  </div>`;
+  el.innerHTML =
+    row(nvdaOk, 'NVDA acumulada Q2', nvda?usdFmt(nvda.costO):'—', '$600') +
+    row(btcOk,  'BTC acumulado Q2',  btc ?usdFmt(btc.costO) :'—', '$1,100') +
+    row(true, 'META 4 acciones', 'Completado', '✓') +
+    row(false, 'Próximo: Q3 — AMD refuerzo', 'Jul-Sep 2026', '$400 AMD');
+}
+
+// ─── ADVISOR ─────────────────────────────────────────────────────
+const advState = {};
+
+function goStep(n) {
+  [1,2,3,4].forEach(i => {
+    const el = document.getElementById('step-'+i);
+    if(el) el.style.display = i===n ? 'block' : 'none';
+    const pip = document.getElementById('pip-'+i);
+    if(pip) {
+      pip.style.background = i===n ? 'var(--blue-dim)' : 'transparent';
+      pip.style.color = i<=n ? 'var(--blue)' : 'var(--muted)';
+    }
+  });
+}
+
+function selectOpt(el, groupId) {
+  document.querySelectorAll('#'+groupId+' .opt-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function toggleMulti(el) {
+  el.classList.toggle('selected');
+}
+
+function getSelectedVal(groupId) {
+  const sel = document.querySelector('#'+groupId+' .opt-card.selected');
+  return sel ? sel.dataset.val : null;
+}
+
+function getMultiVals(groupId) {
+  return [...document.querySelectorAll('#'+groupId+' .opt-card.selected')].map(c=>c.dataset.val);
+}
+
+async function generateStrategy() {
+  // Collect data
+  const name      = document.getElementById('adv-name')?.value || 'Inversor';
+  const horizonte = getSelectedVal('opt-horizonte');
+  const riesgo    = getSelectedVal('opt-riesgo');
+  const exp       = getSelectedVal('opt-exp');
+  const capital   = document.getElementById('adv-capital')?.value || '0';
+  const frecuencia= getSelectedVal('opt-frecuencia');
+  const aporte    = document.getElementById('adv-aporte')?.value || '0';
+  const prevExp   = getSelectedVal('opt-prev');
+  const sectores  = getMultiVals('opt-sectores');
+  const activos   = document.getElementById('adv-activos')?.value || '';
+  const notas     = document.getElementById('adv-notas')?.value || '';
+
+  if (!horizonte || !riesgo || !exp) { alert('Por favor completa el Paso 1 antes de continuar.'); goStep(1); return; }
+  if (!frecuencia) { alert('Por favor selecciona la frecuencia de aporte en el Paso 2.'); goStep(2); return; }
+  if (sectores.length === 0) { alert('Por favor selecciona al menos un sector en el Paso 3.'); return; }
+
+  goStep(4);
+  document.getElementById('generating-loader').style.display = 'block';
+  document.getElementById('strategy-result').style.display = 'none';
+  document.getElementById('step4-back').style.display = 'none';
+
+  const loaderMsgs = [
+    'Analizando tu perfil de riesgo...',
+    'Seleccionando activos para tu horizonte...',
+    'Calculando asignaciones por trimestre...',
+    'Construyendo tu checklist personalizado...',
+    'Ajustando la estrategia a tu capital...',
+  ];
+  let mi = 0;
+  const loaderInterval = setInterval(() => {
+    const lm = document.getElementById('loader-msg');
+    if(lm) lm.textContent = loaderMsgs[mi % loaderMsgs.length];
+    mi++;
+  }, 1800);
+
+  const prompt = `Eres un asesor de inversiones experto. Un nuevo inversor quiere una estrategia personalizada. Aquí está su perfil:
+
+PERFIL DEL INVERSOR:
+- Nombre: ${name}
+- Horizonte de inversión: ${horizonte}
+- Tolerancia al riesgo: ${riesgo}
+- Nivel de experiencia: ${exp}
+- Experiencia previa: ${prevExp || 'No especificada'}
+
+CAPITAL:
+- Capital inicial disponible: $${capital} USD
+- Frecuencia de aportes: ${frecuencia}
+- Monto del aporte ${frecuencia}: $${aporte} USD
+
+PREFERENCIAS:
+- Sectores de interés: ${sectores.join(', ')}
+- Activos específicos en mente: ${activos || 'Ninguno especificado'}
+- Notas adicionales: ${notas || 'Ninguna'}
+
+INSTRUCCIONES:
+Genera una estrategia de inversión completa y personalizada en formato JSON. El JSON debe tener EXACTAMENTE esta estructura (no incluyas nada fuera del JSON):
+
+{
+  "resumen": "2-3 oraciones describiendo la estrategia general para ${name}",
+  "perfil_label": "una palabra: Conservador / Moderado / Agresivo",
+  "horizonte_label": "ej: 2 años",
+  "capital_total_proyectado": numero en USD al final del horizonte (estimado),
+  "rendimiento_esperado_pct": numero porcentaje anual esperado,
+  "posiciones": [
+    {
+      "ticker": "SÍMBOLO",
+      "nombre": "Nombre completo",
+      "sector": "Sector",
+      "peso_pct": numero porcentaje del portafolio,
+      "razon": "Por qué este activo para este perfil específico (1 oración)",
+      "riesgo": "Bajo/Medio/Alto"
+    }
+  ],
+  "plan_trimestral": [
+    {
+      "trimestre": "Q1",
+      "periodo": "Ene–Mar 2027",
+      "objetivo": "descripción corta del objetivo del trimestre",
+      "acciones": [
+        {"descripcion": "qué comprar/hacer", "monto": numero USD, "ticker": "SÍMBOLO o LIQUIDEZ"}
+      ]
+    }
+  ],
+  "reglas": [
+    "Regla de oro 1",
+    "Regla de oro 2",
+    "Regla de oro 3",
+    "Regla de oro 4",
+    "Regla de oro 5"
+  ],
+  "advertencias": [
+    "Advertencia o riesgo importante 1",
+    "Advertencia o riesgo importante 2"
+  ]
+}
+
+Genera exactamente ${horizonte.includes('1') || horizonte.includes('Corto') ? 4 : horizonte.includes('3') || horizonte.includes('Mediano') ? 12 : 20} trimestres en plan_trimestral.
+Usa el capital inicial de $${capital} y aportes ${frecuencia}s de $${aporte} para calcular montos reales.
+Selecciona entre 4 y 7 activos/posiciones coherentes con el perfil.
+Responde ÚNICAMENTE con el JSON válido, sin texto adicional, sin markdown, sin backticks.`;
+
+  try {
+    const response = await fetch(''/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': '', 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    clearInterval(loaderInterval);
+
+    let raw = data.content?.map(b => b.text || '').join('') || '';
+    raw = raw.replace(/```json|```/g, '').trim();
+
+    let strategy;
+    try { strategy = JSON.parse(raw); }
+    catch(e) {
+      document.getElementById('generating-loader').style.display = 'none';
+      document.getElementById('strategy-result').style.display = 'block';
+      document.getElementById('strategy-result').innerHTML = `<div class="pf-card" style="border-color:var(--red-dim);"><p style="color:var(--red);font-size:13px;">Error al procesar la respuesta. Intenta de nuevo.</p><pre style="font-size:10px;color:var(--muted);margin-top:8px;overflow:auto;">${raw.substring(0,300)}</pre></div>`;
+      document.getElementById('step4-back').style.display = 'block';
+      return;
+    }
+
+    renderStrategy(strategy, name);
+
+  } catch(err) {
+    clearInterval(loaderInterval);
+    document.getElementById('generating-loader').style.display = 'none';
+    document.getElementById('strategy-result').style.display = 'block';
+    document.getElementById('strategy-result').innerHTML = `<div class="pf-card" style="border-color:var(--red-dim);"><p style="color:var(--red);font-size:13px;">Error de conexión: ${err.message}</p></div>`;
+    document.getElementById('step4-back').style.display = 'block';
+  }
+}
+
+function renderStrategy(s, name) {
+  document.getElementById('generating-loader').style.display = 'none';
+  document.getElementById('step4-back').style.display = 'block';
+
+  const riskColor = s.perfil_label === 'Conservador' ? 'var(--green)' : s.perfil_label === 'Moderado' ? 'var(--amber)' : 'var(--red)';
+  const posColors = {Bajo:'var(--green)',Medio:'var(--amber)',Alto:'var(--red)'};
+
+  let html = `
+  <!-- HEADER RESULTADO -->
+  <div class="strategy-section" style="border-color:var(--blue-dim);background:var(--blue-dim);">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:12px;">
+      <div>
+        <p style="font-family:'DM Mono',monospace;font-size:10px;color:var(--blue);letter-spacing:0.1em;margin-bottom:4px;">ESTRATEGIA PERSONALIZADA PARA</p>
+        <h2 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin:0;">${name}</h2>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span style="background:${riskColor}22;color:${riskColor};border:1px solid ${riskColor}44;border-radius:100px;padding:4px 12px;font-size:11px;font-family:'DM Mono',monospace;">${s.perfil_label||''}</span>
+        <span style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:100px;padding:4px 12px;font-size:11px;font-family:'DM Mono',monospace;">${s.horizonte_label||''}</span>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--text);line-height:1.7;margin-bottom:16px;">${s.resumen||''}</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <div style="background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--border);">
+        <p style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:4px;">CAPITAL PROYECTADO</p>
+        <p style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--green);">$${(s.capital_total_proyectado||0).toLocaleString('en-US',{minimumFractionDigits:0})}</p>
+      </div>
+      <div style="background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--border);">
+        <p style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:4px;">RENDIMIENTO ESPERADO</p>
+        <p style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:var(--amber);">+${s.rendimiento_esperado_pct||0}% anual</p>
+      </div>
+      <div style="background:var(--surface);border-radius:8px;padding:12px;border:1px solid var(--border);">
+        <p style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:4px;">POSICIONES</p>
+        <p style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;">${(s.posiciones||[]).length} activos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- POSICIONES -->
+  <div class="strategy-section">
+    <h3>Activos recomendados</h3>
+    ${(s.posiciones||[]).map(p => `
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);">
+      <div style="width:50px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:${PCOLORS[p.ticker]||'var(--blue)'};">${p.ticker}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:500;">${p.nombre||p.ticker}</div>
+        <div style="font-size:11px;color:var(--muted);">${p.sector||''} · ${p.razon||''}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0;">
+        <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--blue);">${p.peso_pct||0}%</div>
+        <div style="font-size:10px;color:${posColors[p.riesgo]||'var(--muted)'};">Riesgo ${p.riesgo||''}</div>
+      </div>
+      <div style="width:80px;">
+        <div style="background:rgba(255,255,255,0.05);border-radius:4px;height:4px;overflow:hidden;">
+          <div style="width:${p.peso_pct||0}%;height:100%;background:${PCOLORS[p.ticker]||'var(--blue)'};border-radius:4px;"></div>
+        </div>
+      </div>
+    </div>`).join('')}
+  </div>
+
+  <!-- PLAN TRIMESTRAL -->
+  <div class="strategy-section">
+    <h3>Plan trimestral — checklist</h3>
+    <div id="adv-checklist">
+    ${(s.plan_trimestral||[]).map((q, qi) => `
+    <div class="q-block-adv ${qi===0?'adv-active':''}" id="adv-q-${qi}">
+      <div class="q-header-adv">
+        <span class="q-title-adv">${q.trimestre||'Q'+(qi+1)} · ${q.periodo||''}</span>
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">$${((q.acciones||[]).reduce((a,x)=>a+(x.monto||0),0)).toLocaleString()} USD</span>
+      </div>
+      <div style="font-size:11px;color:var(--blue);margin-bottom:8px;">${q.objetivo||''}</div>
+      <div class="q-items-adv">
+        ${(q.acciones||[]).map((a,ai) => `
+        <div class="check-adv" id="cadv-${qi}-${ai}" onclick="toggleAdvCheck(${qi},${ai})">
+          <input type="checkbox" id="cb-${qi}-${ai}" onclick="event.stopPropagation();">
+          <span>${a.descripcion||''} <strong style="color:var(--blue);font-family:'DM Mono',monospace;">$${(a.monto||0).toLocaleString()}</strong>${a.ticker&&a.ticker!=='LIQUIDEZ'?` <span style="color:${PCOLORS[a.ticker]||'var(--muted)'};font-family:'DM Mono',monospace;font-size:10px;">${a.ticker}</span>`:''}</span>
+        </div>`).join('')}
+      </div>
+    </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- REGLAS -->
+  <div class="strategy-section">
+    <h3>Reglas de oro para tu estrategia</h3>
+    ${(s.reglas||[]).map((r,i) => `
+    <div style="display:flex;gap:12px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px;">
+      <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue);min-width:22px;">0${i+1}</span>
+      <span style="color:var(--muted);line-height:1.5;">${r}</span>
+    </div>`).join('')}
+  </div>
+
+  <!-- ADVERTENCIAS -->
+  <div class="strategy-section" style="border-color:var(--amber-dim);">
+    <h3 style="color:var(--amber);">⚠ Riesgos a considerar</h3>
+    ${(s.advertencias||[]).map(a => `
+    <div style="display:flex;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px;align-items:flex-start;">
+      <span style="color:var(--amber);flex-shrink:0;">!</span>
+      <span style="color:var(--muted);line-height:1.5;">${a}</span>
+    </div>`).join('')}
+    <p style="font-size:11px;color:var(--muted);margin-top:12px;font-style:italic;">Esta estrategia es generada por IA con fines educativos. No constituye asesoría financiera profesional. Consulta a un asesor certificado antes de invertir.</p>
+  </div>`;
+
+  document.getElementById('strategy-result').innerHTML = html;
+  document.getElementById('strategy-result').style.display = 'block';
+}
+
+function toggleAdvCheck(qi, ai) {
+  const cb  = document.getElementById(`cb-${qi}-${ai}`);
+  const row = document.getElementById(`cadv-${qi}-${ai}`);
+  if (!cb || !row) return;
+  cb.checked = !cb.checked;
+  row.classList.toggle('done', cb.checked);
+}
+
+</script>
+
+</div><!-- end tab-estrategia -->
+
+<!-- TAB: PORTAFOLIO -->
+<div id="tab-portafolio" class="tab-page">
+<div class="container" style="max-width:1200px;">
+
+  <div class="header" style="margin-bottom:28px;">
+    <div class="header-tag">Dashboard Profesional</div>
+    <h1 style="font-size:clamp(22px,4vw,34px);">Portafolio Integrado</h1>
+    <p class="header-sub">Tracking completo · Acciones + Crypto · Actualización manual de precios</p>
+  </div>
+
+  <!-- SYNC BANNER -->
+  <div class="sync-banner">
+    <span>⚡</span>
+    <span>Edita los precios actuales y presiona <strong>Recalcular</strong> para actualizar todas las métricas y gráficas.</span>
+    <button class="btn-update" onclick="recalculate()" style="margin-left:auto;flex-shrink:0;">Recalcular ↻</button>
+  </div>
+
+  <!-- KPI ROW 1 -->
+  <div class="pf-grid4" id="kpi-row">
+    <div class="pf-met"><p class="pf-lbl">Capital invertido abierto</p><p class="pf-val" id="kpi-cost">—</p><p class="pf-sub">Costo posiciones vigentes</p></div>
+    <div class="pf-met"><p class="pf-lbl">Valor actual abierto</p><p class="pf-val" id="kpi-value" style="color:var(--blue)">—</p><p class="pf-sub">A precios actuales</p></div>
+    <div class="pf-met"><p class="pf-lbl">Ganancia no realizada</p><p class="pf-val" id="kpi-unreal">—</p><p class="pf-sub" id="kpi-unreal-pct">—</p></div>
+    <div class="pf-met"><p class="pf-lbl">Utilidad total</p><p class="pf-val" id="kpi-total">—</p><p class="pf-sub" id="kpi-total-pct">—</p></div>
+  </div>
+  <!-- KPI ROW 2 -->
+  <div class="pf-grid4" style="margin-bottom:2rem;">
+    <div class="pf-met"><p class="pf-lbl">Liquidez por ventas</p><p class="pf-val" id="kpi-liq" style="color:var(--blue)">—</p><p class="pf-sub">Efectivo generado</p></div>
+    <div class="pf-met"><p class="pf-lbl">Utilidad realizada</p><p class="pf-val" id="kpi-real">—</p><p class="pf-sub" id="kpi-real-pct">—</p></div>
+    <div class="pf-met"><p class="pf-lbl">Mayor posición</p><p class="pf-val" id="kpi-top" style="font-size:26px;">—</p><p class="pf-sub" id="kpi-top-pct">—</p></div>
+    <div class="pf-met"><p class="pf-lbl">Sharpe estimado</p><p class="pf-val" id="kpi-sharpe" style="color:var(--amber)">—</p><p class="pf-sub">Retorno / volatilidad aprox.</p></div>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="pf-card" style="margin-bottom:1.5rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <p class="pf-st" style="margin:0;">Editor de posiciones</p>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-update" style="background:transparent;color:var(--text);border:1px solid var(--border2);font-size:11px;" onclick="addRow()">+ Agregar</button>
+        <button class="btn-update" style="background:transparent;color:var(--muted);border:1px solid var(--border);font-size:11px;" onclick="resetPortfolio()">Restablecer</button>
+        <button class="btn-update" onclick="recalculate()">Recalcular ↻</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="pos-table" id="pos-editor">
+        <thead><tr>
+          <th>Ticker</th><th>Sector</th><th>Acc. Compradas</th><th>Precio Prom. Compra</th>
+          <th style="color:var(--blue);">Precio Actual ★</th><th>Acc. Vendidas</th><th>Precio Venta Prom.</th><th>Stop Loss</th><th>Objetivo</th><th>Estado</th>
+        </tr></thead>
+        <tbody id="pos-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CHARTS GRID ROW 1 -->
+  <div class="pf-grid2" style="margin-bottom:1rem;">
+    <!-- DONUT -->
+    <div class="pf-card">
+      <p class="pf-st">Distribución del portafolio</p>
+      <div style="position:relative;height:220px;display:flex;align-items:center;justify-content:center;">
+        <canvas id="chart-donut" role="img" aria-label="Gráfica de dona mostrando distribución del portafolio por activo"></canvas>
+        <div id="donut-center" style="position:absolute;text-align:center;pointer-events:none;">
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;" id="donut-total">—</div>
+          <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;">TOTAL</div>
+        </div>
+      </div>
+      <div id="donut-legend" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;"></div>
+    </div>
+    <!-- BAR P/L -->
+    <div class="pf-card">
+      <p class="pf-st">P/L abierto por activo</p>
+      <div style="position:relative;height:220px;">
+        <canvas id="chart-pl" role="img" aria-label="Gráfica de barras mostrando ganancia o pérdida por cada activo"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS GRID ROW 2 -->
+  <div class="pf-grid3" style="margin-bottom:1rem;">
+    <!-- RENDIMIENTO % -->
+    <div class="pf-card">
+      <p class="pf-st">Rendimiento % por activo</p>
+      <div style="position:relative;height:200px;">
+        <canvas id="chart-rend" role="img" aria-label="Gráfica de barras horizontales con rendimiento porcentual de cada activo"></canvas>
+      </div>
+    </div>
+    <!-- GAUGE PORTFOLIO HEALTH -->
+    <div class="pf-card">
+      <p class="pf-st">Salud del portafolio</p>
+      <div style="position:relative;height:200px;display:flex;align-items:center;justify-content:center;">
+        <canvas id="chart-health" role="img" aria-label="Medidor de salud del portafolio"></canvas>
+        <div id="health-center" style="position:absolute;bottom:30px;text-align:center;">
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;" id="health-score">—</div>
+          <div style="font-size:10px;color:var(--muted);" id="health-label">—</div>
+        </div>
+      </div>
+    </div>
+    <!-- SECTOR PIE -->
+    <div class="pf-card">
+      <p class="pf-st">Por sector</p>
+      <div style="position:relative;height:200px;">
+        <canvas id="chart-sector" role="img" aria-label="Gráfica circular de distribución por sector"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW 3: WATERFALL + PROGRESS -->
+  <div class="pf-grid2" style="margin-bottom:1rem;">
+    <!-- WATERFALL TOTAL -->
+    <div class="pf-card">
+      <p class="pf-st">Cascada de valor — de costo a valor actual</p>
+      <div style="position:relative;height:200px;">
+        <canvas id="chart-waterfall" role="img" aria-label="Gráfica en cascada mostrando cómo evoluciona el capital de costo a valor actual"></canvas>
+      </div>
+    </div>
+    <!-- OBJETIVO 70% PROGRESS -->
+    <div class="pf-card">
+      <p class="pf-st">Progreso hacia objetivo +70%</p>
+      <div id="progress-bars-list" style="padding-top:4px;"></div>
+    </div>
+  </div>
+
+  <!-- DETAIL TABLE -->
+  <div class="pf-card" style="margin-bottom:1rem;">
+    <p class="pf-st">Detalle calculado completo</p>
+    <div style="overflow-x:auto;">
+      <table class="detail-table" id="detail-table">
+        <thead><tr>
+          <th style="text-align:left;">Ticker</th>
+          <th>Abiertas</th><th>Costo</th><th>Valor</th>
+          <th>P/L $</th><th>Rend.%</th>
+          <th>Liq. Venta</th><th>P/L Real.</th>
+          <th>Stop Loss</th><th>Objetivo</th>
+          <th>Falta +70%</th><th>Peso</th><th>Semáforo</th>
+        </tr></thead>
+        <tbody id="detail-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ALERTS + SYNC ROW -->
+  <div class="pf-grid2" style="margin-bottom:1rem;">
+    <div class="pf-card">
+      <p class="pf-st">Alertas del portafolio</p>
+      <div id="alerts-list"></div>
+    </div>
+    <div class="pf-card" style="border-color:rgba(167,139,250,0.25);">
+      <p class="pf-st" style="color:var(--purple);">Sync estrategia — Q2 objetivos</p>
+      <div id="sync-checklist"></div>
+    </div>
+  </div>
+
+  <!-- HISTORIAL MANUAL -->
+  <div class="pf-card" style="margin-bottom:2rem;">
+    <p class="pf-st">Historial de operaciones</p>
+    <div style="overflow-x:auto;">
+      <table class="pos-table" id="hist-table">
+        <thead><tr>
+          <th>Fecha</th><th>Ticker</th><th>Tipo</th><th>Cantidad</th><th>Precio</th><th>Total USD</th><th>Notas</th><th></th>
+        </tr></thead>
+        <tbody id="hist-body"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn-update" style="background:transparent;color:var(--text);border:1px solid var(--border2);font-size:11px;" onclick="addHistRow()">+ Registrar operación</button>
+    </div>
+  </div>
+
+</div>
+</div><!-- end tab-portafolio -->
+
+
+<!-- TAB: ASESOR IA -->
+<div id="tab-asesor" class="tab-page">
+<div class="container" style="max-width:860px;">
+
+  <div class="header" style="margin-bottom:28px;">
+    <div class="header-tag">Powered by Claude AI</div>
+    <h1 style="font-size:clamp(22px,4vw,34px);">Asesor de Portafolio</h1>
+    <p class="header-sub">Responde algunas preguntas y recibirás una estrategia de inversión personalizada con checklist trimestral listo para usar.</p>
+  </div>
+
+  <!-- STEP INDICATOR -->
+  <div id="step-indicator" style="display:flex;gap:0;margin-bottom:32px;border-radius:10px;overflow:hidden;border:1px solid var(--border);">
+    <div class="step-pip active" id="pip-1" style="flex:1;padding:10px 8px;text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;background:var(--blue-dim);color:var(--blue);border-right:1px solid var(--border);">01 PERFIL</div>
+    <div class="step-pip" id="pip-2" style="flex:1;padding:10px 8px;text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;color:var(--muted);border-right:1px solid var(--border);">02 CAPITAL</div>
+    <div class="step-pip" id="pip-3" style="flex:1;padding:10px 8px;text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;color:var(--muted);border-right:1px solid var(--border);">03 SECTORES</div>
+    <div class="step-pip" id="pip-4" style="flex:1;padding:10px 8px;text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.08em;color:var(--muted);">04 ESTRATEGIA</div>
+  </div>
+
+  <!-- STEP 1: PERFIL -->
+  <div id="step-1" class="advisor-step">
+    <div class="pf-card">
+      <p class="pf-st">Paso 1 — Tu perfil de inversor</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;">Cuéntanos un poco sobre ti para personalizar tu estrategia. No hay respuestas correctas o incorrectas.</p>
+
+      <div class="advisor-field">
+        <label class="advisor-label">¿Cuál es tu nombre?</label>
+        <input class="pos-input" id="adv-name" placeholder="Ej. Carlos" style="max-width:300px;">
+      </div>
+
+      <div class="advisor-field">
+        <label class="advisor-label">¿Cuál es tu horizonte de inversión?</label>
+        <div class="option-grid" id="opt-horizonte">
+          <div class="opt-card" data-val="Corto plazo (menos de 1 año)" onclick="selectOpt(this,'opt-horizonte')">
+            <div class="opt-icon">⚡</div>
+            <div class="opt-title">Corto plazo</div>
+            <div class="opt-sub">Menos de 1 año</div>
+          </div>
+          <div class="opt-card" data-val="Mediano plazo (1-3 años)" onclick="selectOpt(this,'opt-horizonte')">
+            <div class="opt-icon">📈</div>
+            <div class="opt-title">Mediano plazo</div>
+            <div class="opt-sub">1 a 3 años</div>
+          </div>
+          <div class="opt-card" data-val="Largo plazo (3-7 años)" onclick="selectOpt(this,'opt-horizonte')">
+            <div class="opt-icon">🌱</div>
+            <div class="opt-title">Largo plazo</div>
+            <div class="opt-sub">3 a 7 años</div>
+          </div>
+          <div class="opt-card" data-val="Muy largo plazo (7+ años)" onclick="selectOpt(this,'opt-horizonte')">
+            <div class="opt-icon">🏔</div>
+            <div class="opt-title">Muy largo plazo</div>
+            <div class="opt-sub">7+ años</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="advisor-field">
+        <label class="advisor-label">¿Cuál es tu tolerancia al riesgo?</label>
+        <div class="option-grid" id="opt-riesgo">
+          <div class="opt-card" data-val="Conservador — prefiero proteger mi capital aunque gane menos" onclick="selectOpt(this,'opt-riesgo')">
+            <div class="opt-icon">🛡</div>
+            <div class="opt-title">Conservador</div>
+            <div class="opt-sub">Prioridad: proteger capital</div>
+          </div>
+          <div class="opt-card" data-val="Moderado — acepto algo de riesgo por un retorno razonable" onclick="selectOpt(this,'opt-riesgo')">
+            <div class="opt-icon">⚖️</div>
+            <div class="opt-title">Moderado</div>
+            <div class="opt-sub">Balance riesgo/retorno</div>
+          </div>
+          <div class="opt-card" data-val="Agresivo — quiero máximo crecimiento y acepto alta volatilidad" onclick="selectOpt(this,'opt-riesgo')">
+            <div class="opt-icon">🚀</div>
+            <div class="opt-title">Agresivo</div>
+            <div class="opt-sub">Máximo crecimiento</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="advisor-field">
+        <label class="advisor-label">¿Tienes experiencia invirtiendo?</label>
+        <div class="option-grid" id="opt-exp">
+          <div class="opt-card" data-val="Principiante — es mi primera vez invirtiendo" onclick="selectOpt(this,'opt-exp')">
+            <div class="opt-icon">🌱</div>
+            <div class="opt-title">Principiante</div>
+            <div class="opt-sub">Primera vez</div>
+          </div>
+          <div class="opt-card" data-val="Intermedio — tengo algo de experiencia con acciones o crypto" onclick="selectOpt(this,'opt-exp')">
+            <div class="opt-icon">📊</div>
+            <div class="opt-title">Intermedio</div>
+            <div class="opt-sub">Algo de experiencia</div>
+          </div>
+          <div class="opt-card" data-val="Avanzado — manejo portafolios y conozco análisis técnico/fundamental" onclick="selectOpt(this,'opt-exp')">
+            <div class="opt-icon">🎯</div>
+            <div class="opt-title">Avanzado</div>
+            <div class="opt-sub">Portafolios y análisis</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-update" style="margin-top:8px;" onclick="goStep(2)">Siguiente →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: CAPITAL -->
+  <div id="step-2" class="advisor-step" style="display:none;">
+    <div class="pf-card">
+      <p class="pf-st">Paso 2 — Tu capital disponible</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;">Sé honesto con las cantidades — la estrategia se adapta a tu realidad, no al revés.</p>
+
+      <div class="advisor-field">
+        <label class="advisor-label">Capital inicial disponible para invertir (USD)</label>
+        <div style="display:flex;align-items:center;gap:8px;max-width:300px;">
+          <span style="font-family:'DM Mono',monospace;color:var(--muted);">$</span>
+          <input class="pos-input" id="adv-capital" type="number" placeholder="Ej. 1000" style="flex:1;">
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:6px;">Si no tienes capital inicial, puedes poner 0 y empezar solo con aportes.</p>
+      </div>
+
+      <div class="advisor-field">
+        <label class="advisor-label">¿Cuánto puedes aportar de forma periódica?</label>
+        <div class="option-grid" id="opt-frecuencia">
+          <div class="opt-card" data-val="mensual" onclick="selectOpt(this,'opt-frecuencia')">
+            <div class="opt-icon">📅</div>
+            <div class="opt-title">Mensual</div>
+          </div>
+          <div class="opt-card" data-val="trimestral" onclick="selectOpt(this,'opt-frecuencia')">
+            <div class="opt-icon">🗓</div>
+            <div class="opt-title">Trimestral</div>
+          </div>
+          <div class="opt-card" data-val="semestral" onclick="selectOpt(this,'opt-frecuencia')">
+            <div class="opt-icon">📆</div>
+            <div class="opt-title">Semestral</div>
+          </div>
+          <div class="opt-card" data-val="anual" onclick="selectOpt(this,'opt-frecuencia')">
+            <div class="opt-icon">🎯</div>
+            <div class="opt-title">Anual</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="advisor-field">
+        <label class="advisor-label">Monto del aporte periódico (USD)</label>
+        <div style="display:flex;align-items:center;gap:8px;max-width:300px;">
+          <span style="font-family:'DM Mono',monospace;color:var(--muted);">$</span>
+          <input class="pos-input" id="adv-aporte" type="number" placeholder="Ej. 500" style="flex:1;">
+        </div>
+      </div>
+
+      <div class="advisor-field">
+        <label class="advisor-label">¿Tienes o has tenido posiciones en acciones o crypto?</label>
+        <div class="option-grid" id="opt-prev">
+          <div class="opt-card" data-val="No, empiezo desde cero" onclick="selectOpt(this,'opt-prev')">
+            <div class="opt-icon">0️⃣</div>
+            <div class="opt-title">Desde cero</div>
+            <div class="opt-sub">Sin posiciones previas</div>
+          </div>
+          <div class="opt-card" data-val="Sí, tengo posiciones abiertas actualmente" onclick="selectOpt(this,'opt-prev')">
+            <div class="opt-icon">📂</div>
+            <div class="opt-title">Tengo posiciones</div>
+            <div class="opt-sub">Portafolio activo</div>
+          </div>
+          <div class="opt-card" data-val="Sí, tuve pero ya las cerré" onclick="selectOpt(this,'opt-prev')">
+            <div class="opt-icon">📁</div>
+            <div class="opt-title">Tuve, ya cerré</div>
+            <div class="opt-sub">Experiencia previa</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn-update" style="background:transparent;color:var(--text);border:1px solid var(--border2);" onclick="goStep(1)">← Anterior</button>
+        <button class="btn-update" onclick="goStep(3)">Siguiente →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: SECTORES -->
+  <div id="step-3" class="advisor-step" style="display:none;">
+    <div class="pf-card">
+      <p class="pf-st">Paso 3 — Tus preferencias de inversión</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;">Selecciona los sectores que más te interesan. Puedes elegir varios.</p>
+
+      <div class="advisor-field">
+        <label class="advisor-label">¿Qué sectores te llaman más la atención? (selecciona todos los que quieras)</label>
+        <div class="option-grid" style="grid-template-columns:repeat(3,1fr);" id="opt-sectores">
+          <div class="opt-card multi" data-val="Tecnología e Inteligencia Artificial" onclick="toggleMulti(this)">
+            <div class="opt-icon">🤖</div><div class="opt-title">Tech / IA</div><div class="opt-sub">NVDA, AMD, MSFT</div>
+          </div>
+          <div class="opt-card multi" data-val="Semiconductores" onclick="toggleMulti(this)">
+            <div class="opt-icon">💾</div><div class="opt-title">Semiconductores</div><div class="opt-sub">AMD, NVDA, TSM</div>
+          </div>
+          <div class="opt-card multi" data-val="Redes sociales y publicidad digital" onclick="toggleMulti(this)">
+            <div class="opt-icon">📱</div><div class="opt-title">Social / Ads</div><div class="opt-sub">META, GOOG, SNAP</div>
+          </div>
+          <div class="opt-card multi" data-val="Bitcoin y criptomonedas" onclick="toggleMulti(this)">
+            <div class="opt-icon">₿</div><div class="opt-title">Crypto</div><div class="opt-sub">BTC, ETH, XRP</div>
+          </div>
+          <div class="opt-card multi" data-val="Salud y biotecnología" onclick="toggleMulti(this)">
+            <div class="opt-icon">🧬</div><div class="opt-title">Salud / Biotech</div><div class="opt-sub">XBI, ARKG, JNJ</div>
+          </div>
+          <div class="opt-card multi" data-val="Energía y sostenibilidad" onclick="toggleMulti(this)">
+            <div class="opt-icon">⚡</div><div class="opt-title">Energía</div><div class="opt-sub">ENPH, NEE, XOM</div>
+          </div>
+          <div class="opt-card multi" data-val="Consumo y retail" onclick="toggleMulti(this)">
+            <div class="opt-icon">🛍</div><div class="opt-title">Consumo</div><div class="opt-sub">AMZN, WMT, COST</div>
+          </div>
+          <div class="opt-card multi" data-val="Finanzas y bancos" onclick="toggleMulti(this)">
+            <div class="opt-icon">🏦</div><div class="opt-title">Finanzas</div><div class="opt-sub">JPM, V, BAC</div>
+          </div>
+          <div class="opt-card multi" data-val="ETFs diversificados (S&P500, NASDAQ)" onclick="toggleMulti(this)">
+            <div class="opt-icon">🌍</div><div class="opt-title">ETFs</div><div class="opt-sub">SPY, QQQ, VTI</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="advisor-field">
+        <label class="advisor-label">¿Algún activo específico que ya tengas en mente? (opcional)</label>
+        <input class="pos-input" id="adv-activos" placeholder="Ej. NVDA, BTC, Tesla..." style="max-width:400px;">
+      </div>
+
+      <div class="advisor-field">
+        <label class="advisor-label">¿Algo más que quieras que Claude sepa para personalizar tu estrategia? (opcional)</label>
+        <textarea class="notes-area" id="adv-notas" placeholder="Ej. Vivo en México y mis ingresos son en pesos. Me interesa diversificar en crypto pero soy nuevo en eso..." style="min-height:80px;"></textarea>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button class="btn-update" style="background:transparent;color:var(--text);border:1px solid var(--border2);" onclick="goStep(2)">← Anterior</button>
+        <button class="btn-update" onclick="generateStrategy()">✨ Generar mi estrategia</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: RESULT -->
+  <div id="step-4" class="advisor-step" style="display:none;">
+    <div id="generating-loader" style="text-align:center;padding:60px 20px;">
+      <div style="font-size:40px;margin-bottom:16px;animation:spin 2s linear infinite;display:inline-block;">⚙️</div>
+      <p style="font-family:'DM Mono',monospace;font-size:13px;color:var(--blue);margin-bottom:8px;">Analizando tu perfil...</p>
+      <p style="font-size:12px;color:var(--muted);" id="loader-msg">Claude está construyendo tu estrategia personalizada</p>
+    </div>
+    <div id="strategy-result" style="display:none;">
+      <!-- Strategy rendered here -->
+    </div>
+    <div id="step4-back" style="display:none;margin-top:16px;">
+      <button class="btn-update" style="background:transparent;color:var(--text);border:1px solid var(--border2);" onclick="goStep(3)">← Modificar respuestas</button>
+      <button class="btn-update" style="margin-left:8px;" onclick="generateStrategy()">↻ Regenerar</button>
+    </div>
+  </div>
+
+</div>
+</div><!-- end tab-asesor -->
+
+<style>
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.advisor-step { animation: fadeIn 0.3s ease; }
+.advisor-field { margin-bottom:24px; }
+.advisor-label { display:block; font-family:'DM Mono',monospace; font-size:11px; color:var(--muted); letter-spacing:0.08em; text-transform:uppercase; margin-bottom:10px; }
+.option-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.opt-card { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:14px 10px; text-align:center; cursor:pointer; transition:all 0.15s; }
+.opt-card:hover { border-color:var(--border2); background:var(--surface); }
+.opt-card.selected { border-color:var(--blue); background:var(--blue-dim); }
+.opt-card.multi.selected { border-color:var(--green); background:var(--green-dim); }
+.opt-icon { font-size:22px; margin-bottom:6px; }
+.opt-title { font-size:12px; font-weight:600; margin-bottom:2px; }
+.opt-sub { font-size:10px; color:var(--muted); }
+.strategy-section { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.25rem; margin-bottom:1rem; animation:fadeIn 0.4s ease; }
+.strategy-section h3 { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; margin-bottom:12px; }
+.q-block-adv { border-radius:10px; border:1px solid var(--border); background:var(--surface2); padding:12px 16px; margin-bottom:8px; }
+.q-block-adv.adv-active { border-color:var(--blue); background:var(--blue-dim); }
+.q-header-adv { display:flex;justify-content:space-between;align-items:center;margin-bottom:8px; }
+.q-title-adv { font-family:'Syne',sans-serif;font-size:13px;font-weight:600; }
+.q-items-adv { font-size:12px;color:var(--muted);line-height:1.8; }
+.check-adv { display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer; }
+.check-adv input { width:15px;height:15px;accent-color:var(--green);cursor:pointer; }
+.check-adv span { font-size:12px; }
+.check-adv.done span { color:var(--muted);text-decoration:line-through; }
+</style>
+
+</body>
+</html>
