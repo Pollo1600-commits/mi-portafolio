@@ -1,3 +1,4 @@
+process.on('uncaughtException', err => { console.error('ERROR:', err); process.exit(1); });
 const http = require('http');
 const https = require('https');
 const fs = require('fs');
