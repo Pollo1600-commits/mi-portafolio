@@ -2195,7 +2195,7 @@ async function generateStrategy() {
     mi++;
   }, 1800);
 
-  const prompt = `Eres un asesor de inversiones experto. Un nuevo inversor quiere una estrategia personalizada. Aquí está su perfil:
+  const prompt = `Eres un asesor de inversiones experto con CFA. Un nuevo inversor quiere una estrategia personalizada basada en análisis fundamental real. Aquí está su perfil:
 
 PERFIL DEL INVERSOR:
 - Nombre: ${name}
@@ -2215,7 +2215,9 @@ PREFERENCIAS:
 - Notas adicionales: ${notas || 'Ninguna'}
 
 INSTRUCCIONES:
-Genera una estrategia de inversión completa y personalizada en formato JSON. El JSON debe tener EXACTAMENTE esta estructura (no incluyas nada fuera del JSON):
+Selecciona activos usando criterios de análisis fundamental profesional: P/E ratio vs sector, crecimiento de ingresos YoY, márgenes netos, nivel de deuda (D/E ratio), y posición competitiva (moat). NO elijas activos solo por popularidad o marca. Justifica cada selección con métricas concretas.
+
+Genera una estrategia de inversión completa y personalizada en formato JSON con EXACTAMENTE esta estructura:
 
 {
   "resumen": "2-3 oraciones describiendo la estrategia general para ${name}",
@@ -2226,11 +2228,20 @@ Genera una estrategia de inversión completa y personalizada en formato JSON. El
   "posiciones": [
     {
       "ticker": "SÍMBOLO",
-      "nombre": "Nombre completo",
+      "nombre": "Nombre completo de la empresa",
       "sector": "Sector",
       "peso_pct": numero porcentaje del portafolio,
-      "razon": "Por qué este activo para este perfil específico (1 oración)",
-      "riesgo": "Bajo/Medio/Alto"
+      "razon": "Por qué este activo para este perfil en 1 oración concisa",
+      "riesgo": "Bajo/Medio/Alto",
+      "ventaja": "La ventaja competitiva principal (moat) de esta empresa en 1 oración",
+      "educacion": "Explicación para alguien que empieza a invertir: qué hace la empresa, cómo gana dinero, y por qué puede crecer. Máximo 2 oraciones simples.",
+      "fundamentales": {
+        "pe": "P/E actual vs promedio del sector (ej: 24x vs sector 30x — razonable)",
+        "crecimiento": "Crecimiento de ingresos YoY más reciente (ej: +22% YoY)",
+        "margen": "Margen neto % (ej: 18% — por encima del sector)",
+        "deuda": "Nivel de deuda con contexto (ej: Bajo — D/E ratio 0.3)",
+        "posicion": "Posición competitiva (ej: Líder con 35% market share)"
+      }
     }
   ],
   "plan_trimestral": [
@@ -2258,7 +2269,7 @@ Genera una estrategia de inversión completa y personalizada en formato JSON. El
 
 Genera exactamente ${horizonte.includes('1') || horizonte.includes('Corto') ? 4 : horizonte.includes('3') || horizonte.includes('Mediano') ? 12 : 20} trimestres en plan_trimestral.
 Usa el capital inicial de $${capital} y aportes ${frecuencia}s de $${aporte} para calcular montos reales.
-Selecciona entre 4 y 7 activos/posiciones coherentes con el perfil.
+Selecciona entre 4 y 7 activos con base en análisis fundamental sólido, no solo en tendencias.
 Responde ÚNICAMENTE con el JSON válido, sin texto adicional, sin markdown, sin backticks.`;
 
   try {
@@ -2349,23 +2360,41 @@ function renderStrategy(s, name) {
   <!-- POSICIONES -->
   <div class="strategy-section">
     <h3>Activos recomendados</h3>
-    ${(s.posiciones||[]).map(p => `
-    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border);">
-      <div style="width:50px;font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:${PCOLORS[p.ticker]||'var(--blue)'};">${p.ticker}</div>
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:500;">${p.nombre||p.ticker}</div>
-        <div style="font-size:11px;color:var(--muted);">${p.sector||''} · ${p.razon||''}</div>
-      </div>
-      <div style="text-align:right;flex-shrink:0;">
-        <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:var(--blue);">${p.peso_pct||0}%</div>
-        <div style="font-size:10px;color:${posColors[p.riesgo]||'var(--muted)'};">Riesgo ${p.riesgo||''}</div>
-      </div>
-      <div style="width:80px;">
-        <div style="background:rgba(255,255,255,0.05);border-radius:4px;height:4px;overflow:hidden;">
-          <div style="width:${p.peso_pct||0}%;height:100%;background:${PCOLORS[p.ticker]||'var(--blue)'};border-radius:4px;"></div>
+    ${(s.posiciones||[]).map(p => {
+      const f = p.fundamentales || {};
+      const pcolor = PCOLORS[p.ticker] || 'var(--blue)';
+      return `
+    <div style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;background:var(--surface2);">
+      <!-- FILA PRINCIPAL -->
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+        <div style="min-width:52px;font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:${pcolor};">${p.ticker}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;">${p.nombre||p.ticker}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${p.sector||''}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-family:'DM Mono',monospace;font-size:15px;font-weight:700;color:${pcolor};">${p.peso_pct||0}%</div>
+          <div style="font-size:10px;color:${posColors[p.riesgo]||'var(--muted)'};margin-top:2px;">Riesgo ${p.riesgo||''}</div>
         </div>
       </div>
-    </div>`).join('')}
+      <!-- BARRA DE PESO -->
+      <div style="background:rgba(255,255,255,0.05);border-radius:4px;height:3px;margin-bottom:10px;">
+        <div style="width:${p.peso_pct||0}%;height:100%;background:${pcolor};border-radius:4px;"></div>
+      </div>
+      <!-- FUNDAMENTALES -->
+      ${f.pe||f.crecimiento||f.margen ? `
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin-bottom:10px;">
+        ${f.pe?`<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:7px 9px;border:1px solid var(--border);"><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-bottom:2px;">P/E RATIO</div><div style="font-size:11px;color:var(--text);">${f.pe}</div></div>`:''}
+        ${f.crecimiento?`<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:7px 9px;border:1px solid var(--border);"><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-bottom:2px;">CRECIMIENTO</div><div style="font-size:11px;color:var(--green);">${f.crecimiento}</div></div>`:''}
+        ${f.margen?`<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:7px 9px;border:1px solid var(--border);"><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-bottom:2px;">MARGEN NETO</div><div style="font-size:11px;color:var(--blue);">${f.margen}</div></div>`:''}
+        ${f.deuda?`<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:7px 9px;border:1px solid var(--border);"><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-bottom:2px;">DEUDA</div><div style="font-size:11px;color:var(--text);">${f.deuda}</div></div>`:''}
+        ${f.posicion?`<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:7px 9px;border:1px solid var(--border);"><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-bottom:2px;">POSICIÓN</div><div style="font-size:11px;color:var(--amber);">${f.posicion}</div></div>`:''}
+      </div>` : ''}
+      <!-- VENTAJA Y EDUCACION -->
+      ${p.ventaja?`<div style="font-size:11px;color:var(--blue);margin-bottom:6px;display:flex;gap:6px;align-items:flex-start;"><span style="flex-shrink:0;opacity:0.6;">★</span><span>${p.ventaja}</span></div>`:''}
+      ${p.educacion?`<div style="font-size:12px;color:var(--muted);line-height:1.6;padding:8px 10px;background:rgba(255,255,255,0.02);border-left:2px solid ${pcolor}44;border-radius:0 6px 6px 0;">${p.educacion}</div>`:''}
+    </div>`;
+    }).join('')}
   </div>
 
   <!-- PLAN TRIMESTRAL -->
@@ -2557,7 +2586,80 @@ function applyAIStrategy(s, name) {
   qIds.forEach(q => updateQProgress(q));
   updateGlobal();
 
+  // ── SINCRONIZAR PESTAÑA PORTAFOLIO ──────────────────────────────
+  syncPortfolioFromStrategy(s);
+
   switchTab('estrategia');
+}
+
+function syncPortfolioFromStrategy(s) {
+  if (!s || !s.posiciones || !s.posiciones.length) return;
+  const capital = s.capital_total_proyectado
+    ? Math.round(s.capital_total_proyectado / (s.rendimiento_esperado_pct > 0 ? Math.pow(1 + s.rendimiento_esperado_pct / 100, 1) : 1))
+    : 1000;
+
+  // Reconstruct initial capital from plan_trimestral Q1 monto or peso_pct
+  const q1Total = (s.plan_trimestral?.[0]?.acciones || []).reduce((a, x) => a + (x.monto || 0), 0);
+  const baseCapital = q1Total > 0 ? q1Total * (s.plan_trimestral?.length || 1) : 5000;
+
+  positions = s.posiciones.map(p => ({
+    ticker:   p.ticker || 'N/A',
+    sector:   p.sector || '',
+    bought:   0,
+    avgBuy:   0,
+    current:  0,
+    sold:     0,
+    avgSell:  0,
+    stopLoss: 0,
+    target:   0,
+    _aiPeso:  p.peso_pct || 0,
+    _aiNombre: p.nombre || p.ticker,
+    _aiRazon:  p.razon || '',
+    _aiVentaja: p.ventaja || '',
+    _aiEducacion: p.educacion || '',
+    _aiFundamentales: p.fundamentales || {}
+  }));
+
+  renderEditor();
+  savePortfolio();
+  renderAIPositionsContext(s.posiciones);
+}
+
+function renderAIPositionsContext(posiciones) {
+  const el = document.getElementById('ai-positions-context');
+  if (!el) return;
+  const posColors = {Bajo:'var(--green)',Medio:'var(--amber)',Alto:'var(--red)'};
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);"></div>
+      <p class="pf-st" style="margin:0;">Por qué el Asesor IA eligió estas posiciones</p>
+      <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:2px 6px;">ANÁLISIS FUNDAMENTAL</span>
+    </div>
+    ${posiciones.map(p => {
+      const f = p.fundamentales || {};
+      const pcolor = PCOLORS[p.ticker] || 'var(--blue)';
+      return `
+      <div style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;background:var(--surface2);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <span style="font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:${pcolor};min-width:52px;">${p.ticker}</span>
+          <span style="font-size:12px;font-weight:600;flex:1;">${p.nombre||p.ticker}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:12px;color:${pcolor};">${p.peso_pct||0}%</span>
+          <span style="font-size:10px;color:${posColors[p.riesgo]||'var(--muted)'};">Riesgo ${p.riesgo||''}</span>
+        </div>
+        ${f.pe||f.crecimiento||f.margen ? `
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:5px;margin-bottom:8px;">
+          ${f.pe?`<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:6px 8px;border:1px solid var(--border);"><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-bottom:2px;">P/E</div><div style="font-size:10px;">${f.pe}</div></div>`:''}
+          ${f.crecimiento?`<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:6px 8px;border:1px solid var(--border);"><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-bottom:2px;">CRECIMIENTO</div><div style="font-size:10px;color:var(--green);">${f.crecimiento}</div></div>`:''}
+          ${f.margen?`<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:6px 8px;border:1px solid var(--border);"><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-bottom:2px;">MARGEN</div><div style="font-size:10px;color:var(--blue);">${f.margen}</div></div>`:''}
+          ${f.deuda?`<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:6px 8px;border:1px solid var(--border);"><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-bottom:2px;">DEUDA</div><div style="font-size:10px;">${f.deuda}</div></div>`:''}
+          ${f.posicion?`<div style="background:rgba(255,255,255,0.03);border-radius:6px;padding:6px 8px;border:1px solid var(--border);"><div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-bottom:2px;">POSICIÓN</div><div style="font-size:10px;color:var(--amber);">${f.posicion}</div></div>`:''}
+        </div>` : ''}
+        ${p.ventaja?`<div style="font-size:11px;color:var(--blue);margin-bottom:5px;display:flex;gap:5px;"><span style="opacity:0.6;flex-shrink:0;">★</span><span>${p.ventaja}</span></div>`:''}
+        ${p.educacion?`<div style="font-size:12px;color:var(--muted);line-height:1.6;padding:7px 10px;background:rgba(255,255,255,0.02);border-left:2px solid ${pcolor}44;border-radius:0 6px 6px 0;">${p.educacion}</div>`:''}
+      </div>`;
+    }).join('')}
+  `;
+  el.style.display = 'block';
 }
 
 function resetAllAI(qIds) {
@@ -2632,6 +2734,9 @@ function toggleAdvCheck(qi, ai) {
       </table>
     </div>
   </div>
+
+  <!-- CONTEXTO EDUCATIVO IA -->
+  <div class="pf-card" id="ai-positions-context" style="display:none;margin-bottom:1.5rem;"></div>
 
   <!-- CHARTS GRID ROW 1 -->
   <div class="pf-grid2" style="margin-bottom:1rem;">
