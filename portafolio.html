@@ -657,6 +657,97 @@ h1 {
   .stats-row { grid-template-columns: repeat(2, 1fr); }
   .btc-bars { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* REPLACE STRATEGY CTA */
+.replace-strategy-cta {
+  margin-top: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(0,217,126,0.06), rgba(77,159,255,0.06));
+  border: 1px solid var(--green-border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.replace-strategy-cta-text { flex: 1; }
+.replace-strategy-cta-text strong { display: block; font-size: 14px; color: var(--text); margin-bottom: 4px; }
+.replace-strategy-cta-text span { font-size: 12px; color: var(--muted); }
+.btn-replace-strategy {
+  background: var(--green);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.btn-replace-strategy:hover { opacity: 0.85; }
+
+/* REPLACE STRATEGY MODAL */
+#replace-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+#replace-modal-overlay.open { display: flex; }
+#replace-modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 460px;
+  width: 90%;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+}
+#replace-modal h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+#replace-modal p {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.replace-modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.btn-modal-cancel {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.btn-modal-cancel:hover { color: var(--text); border-color: var(--text); }
+.btn-modal-confirm {
+  background: var(--green);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-modal-confirm:hover { opacity: 0.85; }
 </style>
 </head>
 <body>
@@ -2087,8 +2178,167 @@ function renderStrategy(s, name) {
     <p style="font-size:11px;color:var(--muted);margin-top:12px;font-style:italic;">Esta estrategia es generada por IA con fines educativos. No constituye asesoría financiera profesional. Consulta a un asesor certificado antes de invertir.</p>
   </div>`;
 
+  html += `
+  <!-- REEMPLAZAR ESTRATEGIA CTA -->
+  <div class="replace-strategy-cta">
+    <div class="replace-strategy-cta-text">
+      <strong>¿Te convence esta estrategia?</strong>
+      <span>Puedes usarla como tu plan activo en la pestaña Estrategia, con checklist por periodo incluido.</span>
+    </div>
+    <button class="btn-replace-strategy" onclick="promptReplaceStrategy()">Usar como mi estrategia →</button>
+  </div>`;
+
   document.getElementById('strategy-result').innerHTML = html;
   document.getElementById('strategy-result').style.display = 'block';
+  window._pendingAIStrategy = { strategy: s, name };
+}
+
+function promptReplaceStrategy() {
+  document.getElementById('replace-modal-overlay').classList.add('open');
+}
+
+function closeReplaceModal() {
+  document.getElementById('replace-modal-overlay').classList.remove('open');
+}
+
+function confirmReplaceStrategy() {
+  closeReplaceModal();
+  const pending = window._pendingAIStrategy;
+  if (pending) applyAIStrategy(pending.strategy, pending.name);
+}
+
+function applyAIStrategy(s, name) {
+  const quarters = s.plan_trimestral || [];
+  const PHASE_SIZE = 4;
+  const riskColor = s.perfil_label === 'Conservador' ? 'var(--green)' : s.perfil_label === 'Moderado' ? 'var(--amber)' : 'var(--red)';
+
+  // Build quarter IDs list for resetAll / loadState compatibility
+  const qIds = quarters.map((_, i) => 'aiq' + (i + 1));
+
+  // Build phase blocks HTML
+  let phasesHtml = '';
+  for (let p = 0; p < Math.ceil(quarters.length / PHASE_SIZE); p++) {
+    const phaseQuarters = quarters.slice(p * PHASE_SIZE, (p + 1) * PHASE_SIZE);
+    const phaseNum = p + 1;
+    const phaseTotal = phaseQuarters.reduce((sum, q) =>
+      sum + (q.acciones || []).reduce((a, x) => a + (x.monto || 0), 0), 0);
+
+    phasesHtml += `
+    <div class="phase-block">
+      <div class="phase-title-row">
+        <span class="phase-num">FASE ${phaseNum}</span>
+        <span class="phase-name" style="color:${riskColor}">Año ${phaseNum} — ${phaseQuarters[0]?.periodo?.split('–')[0]?.trim() || ''} · ${phaseQuarters[phaseQuarters.length-1]?.periodo?.split('–')[1]?.trim() || ''}</span>
+        <span class="phase-total">$${phaseTotal.toLocaleString('en-US')}</span>
+      </div>`;
+
+    phaseQuarters.forEach((q, qi) => {
+      const globalIdx = p * PHASE_SIZE + qi;
+      const qId = 'aiq' + (globalIdx + 1);
+      const isFirst = globalIdx === 0;
+      const qTotal = (q.acciones || []).reduce((a, x) => a + (x.monto || 0), 0);
+
+      phasesHtml += `
+      <div class="quarter-card ${isFirst ? 'active open' : ''}" data-q="${qId}">
+        <div class="quarter-header" onclick="toggleQ(this)">
+          <span class="q-label">${q.trimestre || 'Q' + (globalIdx + 1)}</span>
+          <span class="q-period">${q.periodo || ''}</span>
+          <span class="q-amount">$${qTotal.toLocaleString('en-US')}</span>
+          <span class="q-status ${isFirst ? 'active' : 'pending'}">${isFirst ? 'En curso' : 'Pendiente'}</span>
+          <span class="q-chevron">▼</span>
+        </div>
+        <div class="quarter-body">
+          <div class="q-progress">
+            <div class="q-prog-row"><span>Progreso ${q.trimestre || 'Q' + (globalIdx + 1)}</span><span id="${qId}-pct">0%</span></div>
+            <div class="q-prog-track"><div class="q-prog-fill" id="${qId}-bar" style="width:0%"></div></div>
+          </div>
+          <div class="checklist" id="${qId}-list">
+            ${(q.acciones || []).map(a => {
+              const typeKey = (a.ticker || 'liq').toLowerCase().replace(/[^a-z0-9]/g, '');
+              const amtClass = 'amt-' + (PCOLORS[a.ticker] ? typeKey : 'liq');
+              return `
+            <div class="check-item" onclick="toggleCheck(this)" data-q="${qId}" data-amt="${a.monto || 0}" data-type="${typeKey}">
+              <div class="check-box"></div>
+              <div class="check-content">
+                <div class="check-main">${a.descripcion || ''}</div>
+                <div class="check-sub">${a.ticker && a.ticker !== 'LIQUIDEZ' ? a.ticker + ' · ' : ''}$${(a.monto || 0).toLocaleString('en-US')} USD</div>
+              </div>
+              <div class="check-amount" style="color:${PCOLORS[a.ticker] || 'var(--muted)'};">$${(a.monto || 0).toLocaleString('en-US')} ${a.ticker || 'LIQ'}</div>
+            </div>`;
+            }).join('')}
+          </div>
+          <div class="tip-block">
+            <div class="tip-title">⚡ ${q.trimestre || 'Q' + (globalIdx + 1)} — ${q.objetivo || ''}</div>
+            <div class="tip-text">${q.objetivo || ''}</div>
+          </div>
+          <textarea class="notes-area" placeholder="Notas del ${q.trimestre || 'Q' + (globalIdx + 1)}..." onchange="saveNote('${qId}', this.value)" id="notes-${qId}"></textarea>
+        </div>
+      </div>`;
+    });
+
+    phasesHtml += `</div>`;
+  }
+
+  const newHtml = `
+  <div class="header">
+    <div class="header-tag">Estrategia IA — ${name}</div>
+    <h1>${s.horizonte_label || 'Plan'} · ${s.perfil_label || ''}</h1>
+    <p class="header-sub">${s.resumen || ''}</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Capital proyectado</div>
+      <div class="stat-value green">$${(s.capital_total_proyectado || 0).toLocaleString('en-US')}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Rendimiento esperado</div>
+      <div class="stat-value amber">+${s.rendimiento_esperado_pct || 0}% anual</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Posiciones</div>
+      <div class="stat-value blue">${(s.posiciones || []).length} activos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Perfil de riesgo</div>
+      <div class="stat-value" style="color:${riskColor}">${s.perfil_label || '—'}</div>
+    </div>
+  </div>
+
+  <div class="global-progress">
+    <div class="progress-header">
+      <span class="progress-title">Progreso global de la estrategia</span>
+      <span class="progress-pct" id="global-pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="global-bar" style="width:0%"></div>
+    </div>
+  </div>
+
+  ${phasesHtml}
+
+  <div class="export-row">
+    <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+    <button class="btn btn-secondary" onclick="exportJSON()">Exportar progreso (JSON)</button>
+    <button class="btn btn-secondary" onclick="resetAllAI(${JSON.stringify(qIds)})">Reiniciar checklist</button>
+  </div>
+
+`;
+
+  const container = document.querySelector('#tab-estrategia .container');
+  container.innerHTML = newHtml;
+
+  qIds.forEach(q => updateQProgress(q));
+  updateGlobal();
+
+  switchTab('estrategia');
+}
+
+function resetAllAI(qIds) {
+  if (!confirm('¿Reiniciar todo el progreso? Esta acción no se puede deshacer.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  document.querySelectorAll('.check-item.checked').forEach(i => i.classList.remove('checked'));
+  qIds.forEach(q => updateQProgress(q));
+  updateGlobal();
 }
 
 function toggleAdvCheck(qi, ai) {
@@ -2522,6 +2772,18 @@ function toggleAdvCheck(qi, ai) {
 
 </div>
 </div><!-- end tab-asesor -->
+
+<!-- MODAL: REEMPLAZAR ESTRATEGIA -->
+<div id="replace-modal-overlay">
+  <div id="replace-modal">
+    <h3>¿Reemplazar tu estrategia actual?</h3>
+    <p>La pestaña <strong>Estrategia</strong> se actualizará con el plan generado por la IA, incluyendo el checklist por periodo. El progreso actual se perderá y no se puede deshacer.</p>
+    <div class="replace-modal-actions">
+      <button class="btn-modal-cancel" onclick="closeReplaceModal()">Cancelar</button>
+      <button class="btn-modal-confirm" onclick="confirmReplaceStrategy()">Sí, reemplazar</button>
+    </div>
+  </div>
+</div>
 
 <style>
 @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
