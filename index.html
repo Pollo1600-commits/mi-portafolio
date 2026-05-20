@@ -773,7 +773,7 @@ h1 {
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-label">Portafolio hoy</div>
-      <div class="stat-value green">$12,406</div>
+      <div class="stat-value green" id="strat-portfolio-val">$12,406</div>
     </div>
     <div class="stat-card">
       <div class="stat-label">Capital a aportar</div>
@@ -786,6 +786,37 @@ h1 {
     <div class="stat-card">
       <div class="stat-label">Objetivo año 3</div>
       <div class="stat-value amber">~$35K+</div>
+    </div>
+  </div>
+
+  <!-- STATS ROW 2 — Live from portfolio -->
+  <div class="stats-row" style="margin-top:-8px;">
+    <div class="stat-card">
+      <div class="stat-label">Valor actual portafolio</div>
+      <div class="stat-value green" id="strat-valor-actual">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ganancia no realizada</div>
+      <div class="stat-value" id="strat-ganancia">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Rendimiento total</div>
+      <div class="stat-value" id="strat-rendimiento">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Mayor posición</div>
+      <div class="stat-value" id="strat-mayor" style="font-size:22px;">—</div>
+    </div>
+  </div>
+
+  <!-- Q ACTUAL PROGRESS BAR — automático por fecha -->
+  <div class="global-progress" style="margin-top:0;border-color:rgba(77,159,255,0.3);background:rgba(77,159,255,0.05);">
+    <div class="progress-header">
+      <span class="progress-title" style="color:var(--blue);" id="q2-live-title">⚡ Progreso Q actual</span>
+      <span class="progress-pct" id="q2-live-pct" style="color:var(--blue);">—</span>
+    </div>
+    <div id="q2-bars-container" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:12px;">
+      <!-- Populated dynamically by syncStrategyStats() -->
     </div>
   </div>
 
@@ -1402,10 +1433,62 @@ function updateQProgress(q) {
   if (pctEl) pctEl.textContent = pct + '%';
 
   const card = list.closest('.quarter-card');
-  if (card && pct === 100) {
-    card.querySelector('.q-status').className = 'q-status done';
-    card.querySelector('.q-status').textContent = 'Completado';
+  if (!card) return;
+  const statusEl = card.querySelector('.q-status');
+  if (!statusEl) return;
+
+  // Detect current Q by date
+  const today = new Date();
+  const qDates = {
+    q1:{start:'2026-01-01',end:'2026-03-31'},
+    q2:{start:'2026-04-01',end:'2026-06-30'},
+    q3:{start:'2026-07-01',end:'2026-09-30'},
+    q4:{start:'2026-10-01',end:'2026-12-31'},
+    q5:{start:'2027-01-01',end:'2027-03-31'},
+    q6:{start:'2027-04-01',end:'2027-06-30'},
+    q7:{start:'2027-07-01',end:'2027-09-30'},
+    q8:{start:'2027-10-01',end:'2027-12-31'},
+    q9:{start:'2028-01-01',end:'2028-03-31'},
+    q10:{start:'2028-04-01',end:'2028-06-30'},
+    q11:{start:'2028-07-01',end:'2028-09-30'},
+    q12:{start:'2028-10-01',end:'2028-12-31'},
+  };
+
+  const qInfo = qDates[q];
+  let autoStatus = 'pending';
+  if (qInfo) {
+    const start = new Date(qInfo.start);
+    const end   = new Date(qInfo.end);
+    if (today > end) autoStatus = 'past';
+    else if (today >= start && today <= end) autoStatus = 'active';
+    else autoStatus = 'pending';
+  }
+
+  // Final status: checks override date
+  if (pct === 100) {
+    statusEl.className = 'q-status done';
+    statusEl.textContent = 'Completado';
     card.classList.add('completed');
+    card.classList.remove('active');
+  } else if (pct > 0) {
+    statusEl.className = 'q-status active';
+    statusEl.textContent = 'En curso';
+    card.classList.remove('completed');
+    card.classList.add('active');
+  } else if (autoStatus === 'active') {
+    statusEl.className = 'q-status active';
+    statusEl.textContent = 'En curso';
+    card.classList.remove('completed');
+    card.classList.add('active');
+  } else if (autoStatus === 'past') {
+    statusEl.className = 'q-status done';
+    statusEl.textContent = 'Vencido';
+    card.classList.add('completed');
+    card.classList.remove('active');
+  } else {
+    statusEl.className = 'q-status pending';
+    statusEl.textContent = 'Pendiente';
+    card.classList.remove('completed');
     card.classList.remove('active');
   }
 }
@@ -1470,6 +1553,7 @@ function loadState() {
 }
 
 loadState();
+setTimeout(syncStrategyStats, 200);
 
 // ─── TAB SWITCHING ─────────────────────────────────────────────
 function switchTab(name) {
@@ -1478,6 +1562,135 @@ function switchTab(name) {
   document.getElementById('tab-' + name).classList.add('active');
   document.querySelector(`[onclick="switchTab('${name}')"]`).classList.add('active');
   if (name === 'portafolio') { loadPortfolio(); setTimeout(recalculate, 50); }
+  if (name === 'estrategia') { setTimeout(syncStrategyStats, 100); }
+}
+
+function syncStrategyStats() {
+  if (!positions || positions.length === 0) return;
+
+  // ── PLAN DE OBJETIVOS POR TRIMESTRE ─────────────────────────────
+  // Cada Q define: qué activos rastrear, sus metas, etiqueta y período
+  const PLAN = [
+    { q:'Q1', periodo:'Ene–Mar 2026', start:'2026-01-01', end:'2026-03-31',
+      targets:[{ticker:'BTC',meta:500,label:'BTC acumulado'},{ticker:'META',meta:600,label:'META completada'},{ticker:'NVDA',meta:200,label:'NVDA refuerzo'}] },
+    { q:'Q2', periodo:'Abr–Jun 2026', start:'2026-04-01', end:'2026-06-30',
+      targets:[{ticker:'BTC',meta:1100,label:'BTC acumulado'},{ticker:'NVDA',meta:2741,label:'NVDA acumulado'}] },
+    { q:'Q3', periodo:'Jul–Sep 2026', start:'2026-07-01', end:'2026-09-30',
+      targets:[{ticker:'BTC',meta:1700,label:'BTC acumulado'},{ticker:'AMD',meta:400,label:'AMD refuerzo'}] },
+    { q:'Q4', periodo:'Oct–Dic 2026', start:'2026-10-01', end:'2026-12-31',
+      targets:[{ticker:'BTC',meta:2400,label:'BTC acumulado'}] },
+    { q:'Q5', periodo:'Ene–Mar 2027', start:'2027-01-01', end:'2027-03-31',
+      targets:[{ticker:'BTC',meta:2700,label:'BTC acumulado'},{ticker:'TSM',meta:400,label:'TSM primera compra'}] },
+    { q:'Q6', periodo:'Abr–Jun 2027', start:'2027-04-01', end:'2027-06-30',
+      targets:[{ticker:'BTC',meta:3100,label:'BTC acumulado'},{ticker:'TSM',meta:800,label:'TSM consolidado'}] },
+    { q:'Q7', periodo:'Jul–Sep 2027', start:'2027-07-01', end:'2027-09-30',
+      targets:[{ticker:'BTC',meta:3500,label:'BTC acumulado'},{ticker:'XBI',meta:400,label:'Biotech acumulado'}] },
+    { q:'Q8', periodo:'Oct–Dic 2027', start:'2027-10-01', end:'2027-12-31',
+      targets:[{ticker:'BTC',meta:3800,label:'BTC acumulado'},{ticker:'XBI',meta:900,label:'Biotech acumulado'}] },
+    { q:'Q9', periodo:'Ene–Mar 2028', start:'2028-01-01', end:'2028-03-31',
+      targets:[{ticker:'BTC',meta:4300,label:'BTC acumulado'}] },
+    { q:'Q10', periodo:'Abr–Jun 2028', start:'2028-04-01', end:'2028-06-30',
+      targets:[{ticker:'BTC',meta:4900,label:'BTC acumulado'}] },
+    { q:'Q11', periodo:'Jul–Sep 2028', start:'2028-07-01', end:'2028-09-30',
+      targets:[{ticker:'BTC',meta:5500,label:'BTC acumulado'}] },
+    { q:'Q12', periodo:'Oct–Dic 2028', start:'2028-10-01', end:'2028-12-31',
+      targets:[{ticker:'BTC',meta:6000,label:'BTC acumulado'}] },
+  ];
+
+  // ── DETECTAR Q ACTUAL POR FECHA ──────────────────────────────────
+  const today = new Date();
+  let currentQ = PLAN[PLAN.length - 1];
+  for (const q of PLAN) {
+    const end = new Date(q.end);
+    if (today <= end) { currentQ = q; break; }
+  }
+
+  // ── CALCULAR MÉTRICAS DEL PORTAFOLIO ────────────────────────────
+  let totCost=0, totVal=0, totReal=0, totLiq=0;
+  const tickerCost = {};
+  let topTicker='', topVal=0;
+
+  positions.forEach(p => {
+    const open = Math.max(0, p.bought - p.sold);
+    const costO = open * p.avgBuy;
+    const valO  = open * p.current;
+    const liq   = p.sold * p.avgSell;
+    const plR   = p.sold > 0 ? (p.sold * p.avgSell) - (p.sold * p.avgBuy) : 0;
+    if (open > 0) { totCost += costO; totVal += valO; }
+    totLiq += liq; totReal += plR;
+    tickerCost[p.ticker] = (tickerCost[p.ticker] || 0) + costO;
+    if (valO > topVal) { topVal = valO; topTicker = p.ticker; }
+  });
+
+  const unreal    = totVal - totCost;
+  const unrealPct = totCost > 0 ? (unreal/totCost)*100 : 0;
+  const totPL     = unreal + totReal;
+  const totPLPct  = totCost > 0 ? (totPL/totCost)*100 : 0;
+
+  const fmt    = n => '$' + Math.round(n||0).toLocaleString('en-US');
+  const fmtD   = n => '$' + (n||0).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0});
+  const fmtPct = n => (n>=0?'+':'')+n.toFixed(1)+'%';
+  const colG   = (el, v, pos) => { if(el){ el.textContent=v; el.style.color = pos ? 'var(--green)' : 'var(--red)'; }};
+
+  // ── ACTUALIZAR STATS ─────────────────────────────────────────────
+  const sv = document.getElementById('strat-valor-actual');
+  if(sv) { sv.textContent = fmt(totVal); sv.style.color='var(--blue)'; }
+
+  colG(document.getElementById('strat-ganancia'), (unreal>=0?'+':'')+fmt(unreal), unreal>=0);
+  colG(document.getElementById('strat-rendimiento'), fmtPct(totPLPct), totPLPct>=0);
+
+  const sm = document.getElementById('strat-mayor');
+  if(sm) { sm.textContent = topTicker; sm.style.color='var(--text)'; }
+
+  const spv = document.getElementById('strat-portfolio-val');
+  if(spv) { spv.textContent = fmt(totVal); }
+
+  // ── BTC ACUMULADOR ───────────────────────────────────────────────
+  const btcCost = tickerCost['BTC'] || 0;
+  const btcEl   = document.getElementById('btc-total');
+  const btcAmt1 = document.getElementById('btc-amt-1');
+  const btcBar1 = document.getElementById('btc-bar-1');
+  if(btcEl)   btcEl.textContent  = fmt(btcCost);
+  if(btcAmt1) btcAmt1.textContent = fmt(btcCost);
+  if(btcBar1) btcBar1.style.height = Math.min(100, (btcCost/6000)*100) + '%';
+
+  // ── Q ACTUAL: ACTUALIZAR BARRA DE PROGRESO ───────────────────────
+  const qTitle  = document.getElementById('q2-live-title');
+  const q2LivePct = document.getElementById('q2-live-pct');
+
+  // Update title
+  if(qTitle) qTitle.textContent = `⚡ Progreso ${currentQ.q} — ${currentQ.periodo}`;
+
+  // Render dynamic progress bars
+  const barsContainer = document.getElementById('q2-bars-container');
+  if (barsContainer) {
+    barsContainer.innerHTML = '';
+    let totalPct = 0;
+    currentQ.targets.forEach((t, idx) => {
+      const actual = tickerCost[t.ticker] || 0;
+      const pct    = Math.min(100, (actual / t.meta) * 100);
+      totalPct    += pct;
+      const color  = t.ticker === 'BTC' ? 'var(--btc)' :
+                     t.ticker === 'NVDA' ? 'var(--blue)' :
+                     t.ticker === 'AMD'  ? '#E24B4A' :
+                     t.ticker === 'META' ? '#7F77DD' :
+                     t.ticker === 'TSM'  ? 'var(--green)' : 'var(--amber)';
+      const done   = pct >= 100;
+      barsContainer.innerHTML += `
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;">
+            <span style="color:${color};font-weight:500;">${t.ticker}</span>
+            <span style="${done?'color:var(--green);font-weight:600;':''}">${done?'✓ ':''} ${fmt(actual)} / ${fmt(t.meta)}</span>
+          </div>
+          <div class="progress-track" style="height:8px;">
+            <div class="progress-fill" style="width:${pct}%;background:${color};transition:width 0.6s ease;"></div>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:3px;text-align:right;">${pct.toFixed(0)}% ${done?'✅':('— falta '+fmt(t.meta-actual))}</div>
+        </div>`;
+    });
+    const avgPct = currentQ.targets.length ? (totalPct / currentQ.targets.length).toFixed(0) : 0;
+    if(q2LivePct) q2LivePct.textContent = avgPct + '%';
+  }
 }
 
 // ─── CHART.JS LOAD ──────────────────────────────────────────────
@@ -1595,13 +1808,23 @@ function renderHistory() {
         <option ${h.type==='Venta'?'selected':''} style="color:var(--red)">Venta</option>
         <option ${h.type==='Conversión'?'selected':''} style="color:var(--blue)">Conversión</option>
       </select></td>
-      <td><input class="pos-input" type="number" value="${h.qty||0}" onchange="history[${i}].qty=parseFloat(this.value)||0" style="width:100px;"></td>
-      <td><input class="pos-input" type="number" value="${h.price||0}" onchange="history[${i}].price=parseFloat(this.value)||0" style="width:100px;"></td>
-      <td style="font-family:monospace;font-size:11px;color:var(--muted);padding:6px;">$${parseFloat(total).toLocaleString('en-US',{minimumFractionDigits:2})}</td>
+      <td><input class="pos-input" type="number" value="${h.qty||0}" onchange="history[${i}].qty=parseFloat(this.value)||0; updateHistTotal(${i});" style="width:100px;" id="hist-qty-${i}"></td>
+      <td><input class="pos-input" type="number" value="${h.price||0}" onchange="history[${i}].price=parseFloat(this.value)||0; updateHistTotal(${i});" style="width:100px;" id="hist-price-${i}"></td>
+      <td id="hist-total-${i}" style="font-family:monospace;font-size:12px;color:var(--green);padding:6px;font-weight:500;">$${parseFloat(total).toLocaleString('en-US',{minimumFractionDigits:2})}</td>
       <td><input class="pos-input" value="${h.notes||''}" onchange="history[${i}].notes=this.value" style="width:160px;"></td>
       <td><button onclick="history.splice(${i},1);renderHistory();" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;">×</button></td>
     </tr>`;
   });
+}
+
+
+function updateHistTotal(idx) {
+  const qty   = parseFloat(document.getElementById('hist-qty-'+idx)?.value) || 0;
+  const price = parseFloat(document.getElementById('hist-price-'+idx)?.value) || 0;
+  const total = (qty * price).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const el = document.getElementById('hist-total-'+idx);
+  if (el) el.textContent = '$' + total;
+  savePortfolio();
 }
 
 function addHistRow() {
@@ -2039,11 +2262,11 @@ Selecciona entre 4 y 7 activos/posiciones coherentes con el perfil.
 Responde ÚNICAMENTE con el JSON válido, sin texto adicional, sin markdown, sin backticks.`;
 
   try {
-    const response = await fetch(''/v1/messages', {
+    const response = await fetch('http://127.0.0.1:3000/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': '', 'anthropic-version': '2023-06-01' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': 'TU_API_KEY_AQUI', 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 4000,
         messages: [{ role: 'user', content: prompt }]
       })
@@ -2211,11 +2434,8 @@ function applyAIStrategy(s, name) {
   const quarters = s.plan_trimestral || [];
   const PHASE_SIZE = 4;
   const riskColor = s.perfil_label === 'Conservador' ? 'var(--green)' : s.perfil_label === 'Moderado' ? 'var(--amber)' : 'var(--red)';
-
-  // Build quarter IDs list for resetAll / loadState compatibility
   const qIds = quarters.map((_, i) => 'aiq' + (i + 1));
 
-  // Build phase blocks HTML
   let phasesHtml = '';
   for (let p = 0; p < Math.ceil(quarters.length / PHASE_SIZE); p++) {
     const phaseQuarters = quarters.slice(p * PHASE_SIZE, (p + 1) * PHASE_SIZE);
@@ -2254,7 +2474,6 @@ function applyAIStrategy(s, name) {
           <div class="checklist" id="${qId}-list">
             ${(q.acciones || []).map(a => {
               const typeKey = (a.ticker || 'liq').toLowerCase().replace(/[^a-z0-9]/g, '');
-              const amtClass = 'amt-' + (PCOLORS[a.ticker] ? typeKey : 'liq');
               return `
             <div class="check-item" onclick="toggleCheck(this)" data-q="${qId}" data-amt="${a.monto || 0}" data-type="${typeKey}">
               <div class="check-box"></div>
@@ -2320,9 +2539,7 @@ function applyAIStrategy(s, name) {
     <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
     <button class="btn btn-secondary" onclick="exportJSON()">Exportar progreso (JSON)</button>
     <button class="btn btn-secondary" onclick="resetAllAI(${JSON.stringify(qIds)})">Reiniciar checklist</button>
-  </div>
-
-`;
+  </div>`;
 
   const container = document.querySelector('#tab-estrategia .container');
   container.innerHTML = newHtml;
