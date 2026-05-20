@@ -2262,9 +2262,11 @@ Selecciona entre 4 y 7 activos/posiciones coherentes con el perfil.
 Responde ÚNICAMENTE con el JSON válido, sin texto adicional, sin markdown, sin backticks.`;
 
   try {
-    const response = await fetch('http://127.0.0.1:3000/v1/messages', {
+    // ⬇ Reemplaza esta URL con la de tu Cloudflare Worker tras desplegarlo
+    const WORKER_URL = 'https://TU-WORKER.TU-USUARIO.workers.dev';
+    const response = await fetch(WORKER_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': 'TU_API_KEY_AQUI', 'anthropic-version': '2023-06-01' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4000,
