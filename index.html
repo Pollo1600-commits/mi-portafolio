@@ -2262,8 +2262,7 @@ Selecciona entre 4 y 7 activos/posiciones coherentes con el perfil.
 Responde ÚNICAMENTE con el JSON válido, sin texto adicional, sin markdown, sin backticks.`;
 
   try {
-    // ⬇ Reemplaza esta URL con la de tu Cloudflare Worker tras desplegarlo
-    const WORKER_URL = 'https://TU-WORKER.TU-USUARIO.workers.dev';
+    const WORKER_URL = 'https://anthropic-proxy.mauriciorodriguez1600.workers.dev';
     const response = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
