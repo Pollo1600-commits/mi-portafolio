@@ -2262,8 +2262,7 @@ Selecciona entre 4 y 7 activos/posiciones coherentes con el perfil.
 Responde ÚNICAMENTE con el JSON válido, sin texto adicional, sin markdown, sin backticks.`;
 
   try {
-    const WORKER_URL = 'https://anthropic-proxy.mauriciorodriguez1600.workers.dev';
-    const response = await fetch(WORKER_URL, {
+    const response = await fetch('/v1/messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
