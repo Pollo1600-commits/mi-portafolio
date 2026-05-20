@@ -2276,6 +2276,16 @@ Responde ÚNICAMENTE con el JSON válido, sin texto adicional, sin markdown, sin
     const data = await response.json();
     clearInterval(loaderInterval);
 
+    // Si Anthropic devuelve un error, mostrarlo claramente
+    if (data.type === 'error' || data.error) {
+      const errMsg = data.error?.message || data.error || JSON.stringify(data);
+      document.getElementById('generating-loader').style.display = 'none';
+      document.getElementById('strategy-result').style.display = 'block';
+      document.getElementById('strategy-result').innerHTML = `<div class="pf-card" style="border-color:var(--red-dim);"><p style="color:var(--red);font-size:13px;">Error de Anthropic: ${errMsg}</p></div>`;
+      document.getElementById('step4-back').style.display = 'block';
+      return;
+    }
+
     let raw = data.content?.map(b => b.text || '').join('') || '';
     raw = raw.replace(/```json|```/g, '').trim();
 
@@ -2284,7 +2294,7 @@ Responde ÚNICAMENTE con el JSON válido, sin texto adicional, sin markdown, sin
     catch(e) {
       document.getElementById('generating-loader').style.display = 'none';
       document.getElementById('strategy-result').style.display = 'block';
-      document.getElementById('strategy-result').innerHTML = `<div class="pf-card" style="border-color:var(--red-dim);"><p style="color:var(--red);font-size:13px;">Error al procesar la respuesta. Intenta de nuevo.</p><pre style="font-size:10px;color:var(--muted);margin-top:8px;overflow:auto;">${raw.substring(0,300)}</pre></div>`;
+      document.getElementById('strategy-result').innerHTML = `<div class="pf-card" style="border-color:var(--red-dim);"><p style="color:var(--red);font-size:13px;">Error al procesar la respuesta.</p><pre style="font-size:10px;color:var(--muted);margin-top:8px;overflow:auto;">${raw.substring(0,500)}</pre></div>`;
       document.getElementById('step4-back').style.display = 'block';
       return;
     }
