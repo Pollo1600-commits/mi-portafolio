@@ -2283,8 +2283,18 @@ Responde ÚNICAMENTE con el JSON válido, sin texto adicional, sin markdown, sin
       })
     });
 
-    const data = await response.json();
+    const rawText = await response.text();
     clearInterval(loaderInterval);
+
+    let data;
+    try { data = JSON.parse(rawText); }
+    catch(e) {
+      document.getElementById('generating-loader').style.display = 'none';
+      document.getElementById('strategy-result').style.display = 'block';
+      document.getElementById('strategy-result').innerHTML = `<div class="pf-card" style="border-color:var(--red-dim);"><p style="color:var(--red);font-size:13px;">Error del servidor (HTTP ${response.status}): el servicio está iniciando o no disponible. Espera 30 segundos y vuelve a intentar.</p></div>`;
+      document.getElementById('step4-back').style.display = 'block';
+      return;
+    }
 
     // Si Anthropic devuelve un error, mostrarlo claramente
     if (data.type === 'error' || data.error) {
