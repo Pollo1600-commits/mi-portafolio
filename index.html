@@ -2182,8 +2182,9 @@ async function generateStrategy() {
   document.getElementById('step4-back').style.display = 'none';
 
   const loaderMsgs = [
-    'Analizando tu perfil de riesgo...',
-    'Seleccionando activos para tu horizonte...',
+    'Obteniendo datos de mercado reales...',
+    'Analizando P/E y márgenes actuales...',
+    'Seleccionando activos con fundamentos sólidos...',
     'Calculando asignaciones por trimestre...',
     'Construyendo tu checklist personalizado...',
     'Ajustando la estrategia a tu capital...',
@@ -2194,6 +2195,32 @@ async function generateStrategy() {
     if(lm) lm.textContent = loaderMsgs[mi % loaderMsgs.length];
     mi++;
   }, 1800);
+
+  // ── DATOS DE MERCADO REALES (Yahoo Finance vía proxy) ──────────
+  const UNIVERSE = 'NVDA,AMD,META,MSFT,AAPL,GOOGL,AMZN,TSM,AVGO,QCOM,JPM,V,MA,UNH,LLY,XOM,CVX,PLTR,CRWD,SNOW,COIN,SMCI,ARM,DELL,ORCL';
+  let realDataSection = '';
+  try {
+    const fdRes = await fetch(`/api/fundamentals?tickers=${UNIVERSE}`);
+    if (fdRes.ok) {
+      const fdArr = await fdRes.json();
+      const today = new Date().toLocaleDateString('es-MX', {day:'2-digit',month:'short',year:'numeric'});
+      const lines = fdArr
+        .filter(d => !d.error && (d.price || d.pe_trailing || d.net_margin))
+        .map(d => {
+          const pe   = d.pe_trailing  != null ? `P/E ${d.pe_trailing.toFixed(1)}x` : '';
+          const fpe  = d.pe_forward   != null ? `(fwd ${d.pe_forward.toFixed(1)}x)` : '';
+          const rev  = d.revenue_growth != null ? `Rev +${(d.revenue_growth*100).toFixed(1)}% YoY` : '';
+          const nm   = d.net_margin   != null ? `Margen neto ${(d.net_margin*100).toFixed(1)}%` : '';
+          const de   = d.debt_to_equity != null ? `D/E ${d.debt_to_equity.toFixed(2)}` : '';
+          const roe  = d.return_on_equity != null ? `ROE ${(d.return_on_equity*100).toFixed(1)}%` : '';
+          const px   = d.price        != null ? `$${d.price.toFixed(2)}` : '';
+          return `  ${d.ticker}: ${[px, pe, fpe, rev, nm, de, roe].filter(Boolean).join(' | ')}`;
+        });
+      if (lines.length > 0) {
+        realDataSection = `\nDATOS DE MERCADO REALES AL ${today} (fuente: Yahoo Finance):\n${lines.join('\n')}\n\nUSA ESTOS DATOS REALES para los campos "fundamentales" de cada posición recomendada. Si un ticker no aparece en la lista, estima y márcalo con "(estimado)".`;
+      }
+    }
+  } catch(e) { /* si falla, Claude usa su entrenamiento */ }
 
   const prompt = `Eres un asesor de inversiones experto con CFA. Un nuevo inversor quiere una estrategia personalizada basada en análisis fundamental real. Aquí está su perfil:
 
@@ -2266,6 +2293,8 @@ Genera una estrategia de inversión completa y personalizada en formato JSON con
     "Advertencia o riesgo importante 2"
   ]
 }
+
+${realDataSection}
 
 Genera exactamente ${horizonte.includes('1') || horizonte.includes('Corto') ? 4 : horizonte.includes('3') || horizonte.includes('Mediano') ? 12 : 20} trimestres en plan_trimestral.
 Usa el capital inicial de $${capital} y aportes ${frecuencia}s de $${aporte} para calcular montos reales.
