@@ -2196,33 +2196,35 @@ async function generateStrategy() {
     mi++;
   }, 1800);
 
-  // ── DATOS DE MERCADO REALES (Yahoo Finance vía proxy) ──────────
-  const UNIVERSE = 'NVDA,AMD,META,MSFT,AAPL,GOOGL,AMZN,TSM,AVGO,QCOM,JPM,V,MA,UNH,LLY,XOM,CVX,PLTR,CRWD,SNOW,COIN,SMCI,ARM,DELL,ORCL';
+  // ── DATOS DE MERCADO REALES (FMP → Yahoo Finance → fallback) ─────
+  const UNIVERSE = 'NVDA,AMD,META,MSFT,AAPL,GOOGL,AMZN,TSM,AVGO,QCOM,JPM,V,MA,LLY,XOM,PLTR,CRWD,SNOW,COIN,SMCI,ARM,DELL,ORCL,BRKB,QQQ';
+  const today    = new Date().toLocaleDateString('es-MX', {day:'2-digit', month:'long', year:'numeric'});
   let realDataSection = '';
+  let dataSource = '';
   try {
     const fdRes = await fetch(`/api/fundamentals?tickers=${UNIVERSE}`);
     if (fdRes.ok) {
-      const fdArr = await fdRes.json();
-      const today = new Date().toLocaleDateString('es-MX', {day:'2-digit',month:'short',year:'numeric'});
+      const payload = await fdRes.json();
+      // Nuevo formato: { source, date, data: [...] }
+      const fdArr = Array.isArray(payload) ? payload : (payload.data || []);
+      dataSource  = payload.source || 'unknown';
       const lines = fdArr
-        .filter(d => !d.error && (d.price || d.pe_trailing || d.net_margin))
+        .filter(d => !d.error && (d.pe_trailing != null || d.net_margin != null || d.revenue_growth != null))
         .map(d => {
-          const pe   = d.pe_trailing  != null ? `P/E ${d.pe_trailing.toFixed(1)}x` : '';
-          const fpe  = d.pe_forward   != null ? `(fwd ${d.pe_forward.toFixed(1)}x)` : '';
-          const rev  = d.revenue_growth != null ? `Rev +${(d.revenue_growth*100).toFixed(1)}% YoY` : '';
-          const nm   = d.net_margin   != null ? `Margen neto ${(d.net_margin*100).toFixed(1)}%` : '';
-          const de   = d.debt_to_equity != null ? `D/E ${d.debt_to_equity.toFixed(2)}` : '';
-          const roe  = d.return_on_equity != null ? `ROE ${(d.return_on_equity*100).toFixed(1)}%` : '';
-          const px   = d.price        != null ? `$${d.price.toFixed(2)}` : '';
-          return `  ${d.ticker}: ${[px, pe, fpe, rev, nm, de, roe].filter(Boolean).join(' | ')}`;
+          const pe  = d.pe_trailing   != null ? `P/E ${d.pe_trailing.toFixed(1)}x` : '';
+          const rev = d.revenue_growth!= null ? `Rev ${d.revenue_growth>=0?'+':''}${(d.revenue_growth*100).toFixed(1)}% YoY (TTM)` : '';
+          const nm  = d.net_margin    != null ? `Margen ${(d.net_margin*100).toFixed(1)}%` : '';
+          const de  = d.debt_to_equity!= null ? `D/E ${d.debt_to_equity.toFixed(2)}` : '';
+          const roe = d.return_on_equity != null ? `ROE ${(d.return_on_equity*100).toFixed(1)}%` : '';
+          return `  ${d.ticker}: ${[pe, rev, nm, de, roe].filter(Boolean).join(' | ')}`;
         });
       if (lines.length > 0) {
-        realDataSection = `\nDATOS DE MERCADO REALES AL ${today} (fuente: Yahoo Finance):\n${lines.join('\n')}\n\nUSA ESTOS DATOS REALES para los campos "fundamentales" de cada posición recomendada. Si un ticker no aparece en la lista, estima y márcalo con "(estimado)".`;
+        realDataSection = `\nDATOS FUNDAMENTALES REALES AL ${today} (fuente: ${dataSource === 'fmp' ? 'Financial Modeling Prep TTM' : 'Yahoo Finance TTM'}):\n${lines.join('\n')}\n\nINSTRUCCIÓN CRÍTICA: USA EXCLUSIVAMENTE estos datos reales en los campos "fundamentales". Cita los números exactos. NO uses "FY2024" — estos son datos TTM (últimos 12 meses) actualizados al ${today}. Si un ticker no aparece, estímalo y pon "(est.)" al final.`;
       }
     }
   } catch(e) { /* si falla, Claude usa su entrenamiento */ }
 
-  const prompt = `Eres un asesor de inversiones experto con CFA. Un nuevo inversor quiere una estrategia personalizada basada en análisis fundamental real. Aquí está su perfil:
+  const prompt = `Eres un asesor de inversiones experto con CFA. La fecha de hoy es ${today}. Usa siempre datos del periodo más reciente disponible (2025-2026 TTM). NUNCA etiquetes métricas como "FY2024". Un nuevo inversor quiere una estrategia personalizada basada en análisis fundamental real. Aquí está su perfil:
 
 PERFIL DEL INVERSOR:
 - Nombre: ${name}
